@@ -1,0 +1,375 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c:#00E5BC;--c2:#0099FF;--y:#F5A623;--r:#FF3A3A;--g:#00D166;
+  --bg:#0A0A0A;--s1:#111111;--s2:#1A1A1A;--s3:#222222;
+  --b1:rgba(0,229,188,0.1);--b2:rgba(0,229,188,0.05);
+  --bd:#333333;--bd2:#222222;
+}
+body{background:var(--bg);color:#A0A0A0;font-family:'Inter',sans-serif;font-size:11px;overflow-x:hidden}
+canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4}
+.wrap{position:relative;z-index:1}
+
+.hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-badge{background:var(--c);color:#000;font-family:'Share Tech Mono',monospace;font-weight:700;font-size:11px;padding:4px 8px;letter-spacing:1px;border-radius:2px}
+.logo-name{font-family:'Share Tech Mono',monospace;font-weight:700;font-size:16px;color:#FFF;letter-spacing:2px}
+.ping{width:8px;height:8px;border-radius:50%;background:var(--g)}
+.hdr-stats{display:flex;gap:24px;align-items:center}
+.hs{text-align:left}
+.hs .hl{color:#666;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.hs .hv{color:#FFF;font-size:12px;font-family:'Share Tech Mono',monospace}
+.clock-box{font-family:'Share Tech Mono',monospace;font-size:16px;color:#FFF;min-width:80px;text-align:right}
+
+.body{display:grid;grid-template-columns:180px 1fr 200px;gap:1px;background:var(--bd)}
+
+.lp{background:var(--s1);padding:12px 0;display:flex;flex-direction:column}
+.lp-sec{padding:8px 12px 4px;font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;font-weight:600}
+.lp-item{padding:8px 12px;display:flex;align-items:center;gap:8px;color:#AAA;font-size:11px;font-family:'Share Tech Mono',monospace}
+.lp-item.on{background:var(--s2);color:#FFF;border-left:2px solid var(--c)}
+.mi{font-family:'Material Symbols Outlined';font-size:14px;width:16px;color:#888}
+.lp-item.on .mi{color:var(--c)}
+.lp-val{margin-left:auto;font-size:11px;font-weight:600}
+.lp-bar{height:3px;background:var(--s3);margin:2px 12px 6px;border-radius:2px;overflow:hidden}
+.lp-bar-f{height:100%;transition:width 0.5s ease}
+.lp-divider{height:1px;background:var(--bd2);margin:8px 12px}
+
+.cp{background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:12px}
+.sec-title{font-size:10px;letter-spacing:1px;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:8px;text-transform:uppercase;font-weight:600}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
+
+.env-c{background:var(--s1);border:1px solid var(--bd2);padding:12px;border-radius:4px}
+.env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.env-c .el{font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;margin-bottom:4px}
+.env-c .ev{font-family:'Share Tech Mono',monospace;font-size:20px;color:#FFF}
+.env-c .eu{font-size:10px;color:#888;margin-left:2px}
+.env-c .ebar{height:3px;background:var(--s3);margin-top:8px;border-radius:2px}
+.env-c .ebf{height:100%;border-radius:2px}
+
+.tox-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tox-c{background:var(--s1);border:1px solid var(--bd2);padding:12px;border-radius:4px}
+.tox-c.tw{border:1px solid var(--y);background:rgba(245,166,35,0.05)}
+.tox-c.tr{border:1px solid var(--r);background:rgba(255,58,58,0.05)}
+.tl{font-size:10px;color:#888;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-weight:600}
+.tv{font-family:'Share Tech Mono',monospace;font-size:22px;color:#FFF}
+.tox-c.tw .tv{color:var(--y)}.tox-c.tr .tv{color:var(--r)}
+.tox-sub{font-size:9px;color:#666;margin-top:4px}
+.bdg{font-size:8px;padding:2px 6px;border-radius:2px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bdg.ok{background:rgba(0,209,102,0.1);color:var(--g)}
+.bdg.wn{background:rgba(245,166,35,0.1);color:var(--y)}
+.bdg.cr{background:rgba(255,58,58,0.1);color:var(--r)}
+
+.log-box{background:var(--s1);border:1px solid var(--bd2);padding:8px 12px;height:80px;overflow-y:auto;border-radius:4px;font-family:'Share Tech Mono',monospace}
+.ll{font-size:10px;line-height:1.6;display:flex;gap:8px}
+.lt{color:#666}.lm{color:#CCC}.lm.ok{color:var(--c)}.lm.wn{color:var(--y)}.lm.cr{color:var(--r)}
+
+.ctrl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cbtn{background:var(--s2);border:1px solid var(--bd);padding:12px 8px;cursor:pointer;text-align:center;font-family:'Share Tech Mono',monospace;font-size:11px;color:#CCC;border-radius:4px;transition:all 0.1s}
+.cbtn:hover:not(:disabled){background:var(--s3);border-color:#555;color:#FFF}
+.cbtn:active:not(:disabled){background:var(--bd);transform:translateY(1px)}
+.cbtn:disabled{opacity:0.3;cursor:not-allowed}
+.ci2{font-family:'Material Symbols Outlined';font-size:18px;display:block;margin-bottom:6px;color:#888}
+.cbtn:hover:not(:disabled) .ci2{color:var(--c)}
+
+.rp{background:var(--s1);padding:16px;display:flex;flex-direction:column;gap:12px}
+.irow{display:flex;justify-content:space-between;font-size:10px;margin-bottom:6px;font-family:'Share Tech Mono',monospace}
+.ik{color:#888}.iv{color:#FFF}
+
+.meter-block{display:flex;flex-direction:column;gap:8px}
+.mrow{display:flex;justify-content:space-between;font-size:10px;color:#888;margin-bottom:4px;font-family:'Share Tech Mono',monospace}
+.mrow span:last-child{color:#FFF}
+.mtrack{height:4px;background:var(--s3);border-radius:2px}
+.mfill{height:100%;border-radius:2px}
+.mfill.mc{background:var(--c2)}
+.mfill.my{background:var(--y)}
+.mfill.mg{background:var(--g)}
+
+.ftr{background:var(--s1);border-top:1px solid var(--bd);padding:8px 16px;display:flex;justify-content:space-between;align-items:center}
+.f-left{display:flex;gap:24px}
+.fi{font-size:10px;color:#666;font-family:'Share Tech Mono',monospace}
+.fi span{color:#AAA}
+.f-alert{font-size:10px;font-weight:600;font-family:'Share Tech Mono',monospace}
+</style>
+
+<div class="wrap">
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-badge">UNIT-01</div>
+    <div class="logo-name">BIO-HAZ CONTROL</div>
+    <div class="ping"></div>
+  </div>
+  <div class="hdr-stats">
+    <div class="hs"><div class="hl">UPTIME</div><div class="hv" id="uptime">04:12:37</div></div>
+    <div class="hs"><div class="hl">SECTOR</div><div class="hv">7-GAMMA</div></div>
+    <div class="hs"><div class="hl">SYS STATUS</div><div class="hv" id="threat-lbl" style="color:var(--y)">CAUTION</div></div>
+    <div class="clock-box" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<div class="body">
+<div class="lp">
+  <div class="lp-sec">SYSTEM</div>
+  <div class="lp-item on"><span class="mi">dashboard</span>Overview</div>
+  <div class="lp-item"><span class="mi">battery_charging_full</span>Main Battery<span class="lp-val" id="lv-batt" style="color:var(--g)">87%</span></div>
+  <div class="lp-bar"><div class="lp-bar-f" id="lb-batt" style="width:87%;background:var(--g)"></div></div>
+  <div class="lp-divider"></div>
+  
+  <div class="lp-sec">BOT HARDWARE</div>
+  <div class="lp-item"><span class="mi">settings</span>Drive Motors<span class="lp-val" style="color:var(--g)">OK</span></div>
+  <div class="lp-item"><span class="mi">autorenew</span>Auger System<span class="lp-val" id="lv-auger" style="color:#FFF">OFF</span></div>
+  <div class="lp-item"><span class="mi">device_thermostat</span>Core Temp<span class="lp-val" id="lv-core">42°C</span></div>
+  <div class="lp-bar"><div class="lp-bar-f" id="lb-core" style="width:42%;background:var(--y)"></div></div>
+  <div class="lp-divider"></div>
+  
+  <div class="lp-sec">COMMS LINK</div>
+  <div class="lp-item"><span class="mi">bluetooth</span>HC-05 Status<span class="lp-val" id="bt-status-text" style="color:var(--r)">DISC</span></div>
+</div>
+
+<div class="cp">
+  <div>
+    <div class="sec-title">SEWAGE ZONE MAPPING</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="zone-grid">
+      <div class="env-c" id="zone-A" style="text-align:center;padding:8px"><div class="tv" style="font-size:14px">Z-A</div><div class="eu">CLEAR</div></div>
+      <div class="env-c" id="zone-B" style="text-align:center;padding:8px"><div class="tv" style="font-size:14px">Z-B</div><div class="eu">CLEAR</div></div>
+      <div class="env-c" id="zone-C" style="text-align:center;padding:8px"><div class="tv" style="font-size:14px">Z-C</div><div class="eu">CLEAR</div></div>
+      <div class="env-c tw" id="zone-D" style="text-align:center;padding:8px"><div class="tv" style="font-size:14px;color:var(--y)">Z-D</div><div class="eu" style="color:var(--y)">HAZARD</div></div>
+      <div class="env-c" id="zone-E" style="text-align:center;padding:8px"><div class="tv" style="font-size:14px">Z-E</div><div class="eu">CLEAR</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-title">WORKER SAFETY DIRECTIVE</div>
+    <div class="env-c" style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(245,166,35,0.05);border-color:var(--y)" id="ws-panel">
+      <div><span class="el" style="color:#FFF">ATMOSPHERE STATUS</span><br><span class="ev" id="ws-status" style="color:var(--y)">CAUTION</span></div>
+      <div style="text-align:right"><span class="el" style="color:#FFF">RECOMMENDED ACTION</span><br><span class="ev" id="ws-action" style="color:var(--y)">VENTILATE AREA</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-title">TOXICITY TELEMETRY</div>
+    <div class="tox-grid">
+      <div class="tox-c tw" id="tc-h2s"><div class="tl">H₂S<span class="bdg wn" id="b-h2s">WARN</span></div><div class="tv" id="tv-h2s">38.4</div><div class="tox-sub">ppm (Limit: 20)</div></div>
+      <div class="tox-c" id="tc-ch4"><div class="tl">CH₄<span class="bdg ok" id="b-ch4">SAFE</span></div><div class="tv" id="tv-ch4">12.1</div><div class="tox-sub">ppm (Limit: 1000)</div></div>
+      <div class="tox-c tr" id="tc-co2"><div class="tl">CO₂<span class="bdg cr" id="b-co2">HIGH</span></div><div class="tv" id="tv-co2">4810</div><div class="tox-sub">ppm (Limit: 5000)</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-title">SYSTEM EVENT LOG</div>
+    <div class="log-box" id="log-box"></div>
+  </div>
+
+  <div>
+    <div class="sec-title" style="display:flex;justify-content:space-between">
+      <span>BOT TELEOPERATION LINK</span>
+      <button onclick="connectBluetooth()" id="btn-bt" style="background:var(--c2);color:#000;border:none;padding:4px 8px;border-radius:2px;font-family:'Share Tech Mono';cursor:pointer;font-weight:bold">CONNECT SERIAL</button>
+    </div>
+    
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="cbtn" id="btn-mode" onclick="toggleMode()" style="flex:1"><span class="ci2">smart_toy</span>MODE: AUTO</button>
+      <button class="cbtn" onclick="sendCmd('X')" id="btn-auger" disabled style="flex:1"><span class="ci2">autorenew</span>TOGGLE AUGER (X)</button>
+    </div>
+    <div class="ctrl-row" style="grid-template-columns:repeat(3,1fr)">
+      <div></div>
+      <button class="cbtn" onmousedown="sendCmd('F')" onmouseup="sendCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD (F)</button>
+      <div></div>
+      <button class="cbtn" onmousedown="sendCmd('L')" onmouseup="sendCmd('S')" id="btn-lft" disabled><span class="ci2">arrow_back</span>LEFT (L)</button>
+      <button class="cbtn" onclick="sendCmd('S')" id="btn-stop" disabled style="border-color:var(--r)"><span class="ci2" style="color:var(--r)">stop</span>STOP (S)</button>
+      <button class="cbtn" onmousedown="sendCmd('R')" onmouseup="sendCmd('S')" id="btn-rgt" disabled><span class="ci2">arrow_forward</span>RIGHT (R)</button>
+      <div></div>
+      <button class="cbtn" onmousedown="sendCmd('B')" onmouseup="sendCmd('S')" id="btn-bwd" disabled><span class="ci2">arrow_downward</span>REV (B)</button>
+      <div></div>
+    </div>
+  </div>
+</div>
+
+<div class="rp">
+  <div class="sec-title">AI VISION ANALYSIS</div>
+  <div class="env-c">
+    <div class="irow"><span class="ik">TARGET CLASSIFICATION</span><span class="iv" id="ai-waste">WET SLUDGE</span></div>
+    <div class="irow"><span class="ik">CURRENT ACTION</span><span class="iv" id="ai-action" style="color:var(--c)">CLEARING</span></div>
+    <div class="irow"><span class="ik">MODEL CONFIDENCE</span><span class="iv" id="ai-conf">92%</span></div>
+    <div class="mtrack" style="margin-top:8px"><div class="mfill mc" id="ai-conf-bar" style="width:92%"></div></div>
+  </div>
+
+  <div class="sec-title" style="margin-top:8px">POWER DIAGNOSTICS</div>
+  <div class="meter-block">
+    <div><div class="mrow"><span>MAIN CELL</span><span id="mv-batt">87%</span></div><div class="mtrack"><div class="mfill mg" id="mm-batt" style="width:87%"></div></div></div>
+    <div><div class="mrow"><span>MOTOR DRAW</span><span id="mv-draw">1.2A</span></div><div class="mtrack"><div class="mfill my" id="mm-draw" style="width:36%"></div></div></div>
+  </div>
+
+  <div class="sec-title" style="margin-top:8px">ENVIRONMENTAL</div>
+  <div class="env-grid" style="grid-template-columns:1fr">
+    <div class="env-c" style="padding:10px">
+      <div class="el">SUBMERSION DEPTH</div>
+      <div><span class="ev" id="ev-depth">4.7</span><span class="eu">m</span></div>
+    </div>
+    <div class="env-c" style="padding:10px">
+      <div class="el">FILTRATION FLOW</div>
+      <div><span class="ev" id="ev-filt">340</span><span class="eu">L/m</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="ftr">
+  <div class="f-left">
+    <div class="fi">SYS_VER: <span>4.7.2</span></div>
+    <div class="fi">PORT: <span id="port-status">DISCONNECTED</span></div>
+    <div class="fi">BAUD: <span>9600</span></div>
+  </div>
+  <div class="f-alert" id="falert" style="color:var(--y)">⚠ VENTILATION ADVISED</div>
+</div>
+</div>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,1,0" rel="stylesheet">
+<script>
+const $ = id => document.getElementById(id);
+function ts(){return new Date().toTimeString().slice(0,8)}
+
+$('clock').textContent=ts();
+setInterval(()=>$('clock').textContent=ts(),1000);
+
+const logs=[];
+function logEvent(msg, type='ok'){
+  logs.unshift({t:'['+ts()+']',m:msg,c:type});
+  if(logs.length>20) logs.pop();
+  $('log-box').innerHTML=logs.map(l=>`<div class="ll"><span class="lt">${l.t}</span><span class="lm ${l.c}">${l.m}</span></div>`).join('');
+}
+logEvent('System initialized. Waiting for serial connection.', 'ok');
+
+// --- BOT STATE ---
+// We start in AUTO mode by default so Python can grab the port when it boots
+let isAuto=true; 
+let portActive=false;
+let augerOn=false;
+let currentZone=1;
+const zones=['A','B','C','D','E'];
+
+// THE HANDOFF LOGIC
+async function toggleMode(){
+  isAuto = !isAuto;
+  $('btn-mode').innerHTML = `<span class="ci2">smart_toy</span>MODE: ${isAuto ? 'AUTO' : 'MANUAL'}`;
+  
+  if(isAuto) {
+    logEvent(`AUTO ENGAGED. Yielding COM port to YOLO script...`, 'wn');
+    // Force disconnect so Python can grab the COM port
+    if(portActive) {
+      await disconnectBluetooth();
+    }
+  } else {
+    logEvent(`MANUAL OVERRIDE. Please click CONNECT SERIAL.`, 'wn');
+  }
+  
+  updateBtnStates();
+}
+
+function updateBtnStates(){
+  // Manual buttons only work if we are in Manual Mode AND the port is connected
+  const dis = isAuto || !portActive;
+  ['btn-fwd','btn-bwd','btn-lft','btn-rgt','btn-stop','btn-auger'].forEach(id=>{
+    $(id).disabled=dis;
+  });
+}
+
+// --- SIMULATED TELEMETRY ---
+setInterval(()=>{
+  if(isAuto && Math.random()<0.2){
+    currentZone = (currentZone+1)%5;
+    logEvent(`Bot advanced to Zone Z-${zones[currentZone]}`, 'ok');
+  }
+  for(let i=0;i<5;i++){
+    const z=$('zone-'+zones[i]);
+    if(i===currentZone){
+      z.style.borderColor='var(--c)';
+      z.style.background='var(--s2)';
+    }else if(i===3){
+      z.style.borderColor='var(--y)';
+      z.style.background='rgba(245,166,35,0.05)';
+    }else{
+      z.style.borderColor='var(--bd2)';
+      z.style.background='var(--s1)';
+    }
+  }
+}, 3000);
+
+// --- WEB SERIAL API (FOR HC-05 COM PORT) ---
+let port;
+let writer;
+
+async function connectBluetooth() {
+  if (!("serial" in navigator)) {
+    alert("Web Serial API not supported. Use Google Chrome or Edge on Desktop.");
+    logEvent("Serial API not supported by browser", "cr");
+    return;
+  }
+
+  // Prevent connecting if we are still in AUTO mode
+  if (isAuto) {
+    alert("Switch to MANUAL MODE first before taking Serial control.");
+    return;
+  }
+
+  try {
+    logEvent("Requesting COM port for Manual Override...", "wn");
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+    
+    const textEncoder = new TextEncoderStream();
+    const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+    writer = textEncoder.writable.getWriter();
+    
+    portActive = true;
+    $('bt-status-text').textContent = "CONNECTED";
+    $('bt-status-text').style.color = "var(--c)";
+    $('port-status').textContent = "COM_ACTIVE";
+    $('btn-bt').textContent = "DISCONNECT";
+    $('btn-bt').style.background = "var(--r)";
+    $('btn-bt').onclick = disconnectBluetooth;
+    
+    updateBtnStates();
+    logEvent("Successfully connected to bot telemetry", "ok");
+
+  } catch (error) {
+    logEvent("Connection failed or cancelled", "cr");
+    console.error(error);
+  }
+}
+
+async function disconnectBluetooth() {
+  if (writer) {
+    writer.releaseLock();
+  }
+  if (port) {
+    await port.close();
+  }
+  portActive = false;
+  $('bt-status-text').textContent = "DISC";
+  $('bt-status-text').style.color = "var(--r)";
+  $('port-status').textContent = "DISCONNECTED";
+  $('btn-bt').textContent = "CONNECT SERIAL";
+  $('btn-bt').style.background = "var(--c2)";
+  $('btn-bt').onclick = connectBluetooth;
+  updateBtnStates();
+  logEvent("Disconnected from COM port", "wn");
+}
+
+async function sendCmd(cmd) {
+  if (isAuto && cmd !== 'S') return; // Only allow Stop in Auto
+  if (!portActive || !writer) return;
+
+  if (cmd === 'X') {
+    augerOn = !augerOn;
+    $('lv-auger').textContent = augerOn ? 'ACTIVE' : 'OFF';
+    $('lv-auger').style.color = augerOn ? 'var(--y)' : '#FFF';
+  }
+
+  try {
+    await writer.write(cmd);
+    logEvent(`TX Command: ${cmd}`, 'ok');
+  } catch (e) {
+    logEvent(`TX Error: ${e.message}`, 'cr');
+  }
+}
+</script>
