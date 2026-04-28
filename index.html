@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BIO-HAZ DASHBOARD</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -91,7 +96,8 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 .fi span{color:#AAA}
 .f-alert{font-size:10px;font-weight:600;font-family:'Share Tech Mono',monospace}
 </style>
-
+</head>
+<body>
 <div class="wrap">
 <div class="hdr">
   <div class="logo">
@@ -149,22 +155,13 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   </div>
 
   <div>
-    <div class="sec-title">TOXICITY TELEMETRY</div>
-    <div class="tox-grid">
-      <div class="tox-c tw" id="tc-h2s"><div class="tl">H₂S<span class="bdg wn" id="b-h2s">WARN</span></div><div class="tv" id="tv-h2s">38.4</div><div class="tox-sub">ppm (Limit: 20)</div></div>
-      <div class="tox-c" id="tc-ch4"><div class="tl">CH₄<span class="bdg ok" id="b-ch4">SAFE</span></div><div class="tv" id="tv-ch4">12.1</div><div class="tox-sub">ppm (Limit: 1000)</div></div>
-      <div class="tox-c tr" id="tc-co2"><div class="tl">CO₂<span class="bdg cr" id="b-co2">HIGH</span></div><div class="tv" id="tv-co2">4810</div><div class="tox-sub">ppm (Limit: 5000)</div></div>
-    </div>
-  </div>
-
-  <div>
     <div class="sec-title">SYSTEM EVENT LOG</div>
     <div class="log-box" id="log-box"></div>
   </div>
 
   <div>
     <div class="sec-title" style="display:flex;justify-content:space-between">
-      <span>BOT TELEOPERATION LINK (CONTROLS: WASD / SPACEBAR / XBOX)</span>
+      <span>MANUAL TELEOPERATION (CONTROLS: WASD / SPACEBAR / XBOX)</span>
       <button onclick="toggleBluetooth()" id="btn-bt" style="background:var(--c2);color:#000;border:none;padding:4px 8px;border-radius:2px;font-family:'Share Tech Mono';cursor:pointer;font-weight:bold">CONNECT SERIAL</button>
     </div>
     
@@ -239,7 +236,7 @@ function logEvent(msg, type='ok'){
   if(logs.length>20) logs.pop();
   $('log-box').innerHTML=logs.map(l=>`<div class="ll"><span class="lt">${l.t}</span><span class="lm ${l.c}">${l.m}</span></div>`).join('');
 }
-logEvent('Web Dashboard initialized. Ready for Manual Override.', 'ok');
+logEvent('Web Dashboard initialized. Connect Serial for Manual Override.', 'ok');
 
 // --- BOT STATE ---
 let portActive = false;
@@ -313,7 +310,7 @@ async function disconnectBluetooth() {
   $('btn-bt').style.background = "var(--c2)";
   
   updateBtnStates();
-  logEvent("Disconnected from COM port. Python script can now connect.", "wn");
+  logEvent("Disconnected from COM port. YOLO can now connect.", "wn");
 }
 
 async function sendCmd(cmd) {
@@ -343,11 +340,10 @@ async function sendCmd(cmd) {
 let activeKey = null;
 
 window.addEventListener('keydown', (e) => {
-  if (!portActive || e.repeat) return; // Ignore if disconnected or key is held down (prevent auto-repeat spam)
+  if (!portActive || e.repeat) return; 
   
   const key = e.key.toLowerCase();
   
-  // Drive Controls (WASD)
   if (['w', 'a', 's', 'd'].includes(key)) {
     activeKey = key;
     if (key === 'w') sendCmd('F');
@@ -356,13 +352,12 @@ window.addEventListener('keydown', (e) => {
     if (key === 'd') sendCmd('R');
   }
 
-  // Auger Toggle (Spacebar)
   if (key === ' ' || e.code === 'Space') {
-    e.preventDefault(); // Stop the webpage from scrolling down when space is pressed
+    e.preventDefault(); 
     if (!augerOn) {
-      sendCmd('X'); // Turn ON
+      sendCmd('X'); 
     } else {
-      sendCmd('x'); // Turn OFF
+      sendCmd('x'); 
     }
   }
 });
@@ -371,7 +366,6 @@ window.addEventListener('keyup', (e) => {
   if (!portActive) return;
   const key = e.key.toLowerCase();
   
-  // Only send STOP if the key we just released was the one driving the bot
   if (key === activeKey) {
     sendCmd('S');
     activeKey = null;
@@ -417,7 +411,6 @@ function pollGamepad() {
     } else if (right) {
       cmd = "R";
     } else if (startAuger || stopAuger) {
-      // Prevent Stop command from overwriting while holding auger buttons
       return; 
     }
 
@@ -441,3 +434,5 @@ window.addEventListener("gamepaddisconnected", (e) => {
 
 pollGamepad();
 </script>
+</body>
+</html>
