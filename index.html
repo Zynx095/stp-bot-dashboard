@@ -124,6 +124,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   
   <div class="lp-sec">COMMS LINK</div>
   <div class="lp-item"><span class="mi">bluetooth</span>HC-05 Status<span class="lp-val" id="bt-status-text" style="color:var(--r)">DISC</span></div>
+  <div class="lp-item"><span class="mi">sports_esports</span>Gamepad<span class="lp-val" id="gp-status-text" style="color:var(--r)">NONE</span></div>
 </div>
 
 <div class="cp">
@@ -163,12 +164,12 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   <div>
     <div class="sec-title" style="display:flex;justify-content:space-between">
       <span>BOT TELEOPERATION LINK</span>
-      <button onclick="connectBluetooth()" id="btn-bt" style="background:var(--c2);color:#000;border:none;padding:4px 8px;border-radius:2px;font-family:'Share Tech Mono';cursor:pointer;font-weight:bold">CONNECT SERIAL</button>
+      <button onclick="toggleBluetooth()" id="btn-bt" style="background:var(--c2);color:#000;border:none;padding:4px 8px;border-radius:2px;font-family:'Share Tech Mono';cursor:pointer;font-weight:bold">CONNECT SERIAL</button>
     </div>
     
     <div style="display:flex;gap:8px;margin-bottom:8px">
-      <button class="cbtn" id="btn-mode" onclick="toggleMode()" style="flex:1"><span class="ci2">smart_toy</span>MODE: AUTO</button>
-      <button class="cbtn" onclick="sendCmd('X')" id="btn-auger" disabled style="flex:1"><span class="ci2">autorenew</span>TOGGLE AUGER (X)</button>
+      <button class="cbtn" onmousedown="sendCmd('X')" id="btn-auger-on" disabled style="flex:1; border-color:var(--y)"><span class="ci2" style="color:var(--y)">autorenew</span>AUGER ON (X)</button>
+      <button class="cbtn" onmousedown="sendCmd('x')" id="btn-auger-off" disabled style="flex:1; border-color:var(--r)"><span class="ci2" style="color:var(--r)">block</span>AUGER OFF (x)</button>
     </div>
     <div class="ctrl-row" style="grid-template-columns:repeat(3,1fr)">
       <div></div>
@@ -237,66 +238,31 @@ function logEvent(msg, type='ok'){
   if(logs.length>20) logs.pop();
   $('log-box').innerHTML=logs.map(l=>`<div class="ll"><span class="lt">${l.t}</span><span class="lm ${l.c}">${l.m}</span></div>`).join('');
 }
-logEvent('System initialized. Waiting for serial connection.', 'ok');
+logEvent('Web Dashboard initialized. Ready for Manual Override.', 'ok');
 
 // --- BOT STATE ---
-// We start in AUTO mode by default so Python can grab the port when it boots
-let isAuto=true; 
-let portActive=false;
-let augerOn=false;
-let currentZone=1;
-const zones=['A','B','C','D','E'];
-
-// THE HANDOFF LOGIC
-async function toggleMode(){
-  isAuto = !isAuto;
-  $('btn-mode').innerHTML = `<span class="ci2">smart_toy</span>MODE: ${isAuto ? 'AUTO' : 'MANUAL'}`;
-  
-  if(isAuto) {
-    logEvent(`AUTO ENGAGED. Yielding COM port to YOLO script...`, 'wn');
-    // Force disconnect so Python can grab the COM port
-    if(portActive) {
-      await disconnectBluetooth();
-    }
-  } else {
-    logEvent(`MANUAL OVERRIDE. Please click CONNECT SERIAL.`, 'wn');
-  }
-  
-  updateBtnStates();
-}
+let portActive = false;
+let currentZone = 1;
+const zones = ['A','B','C','D','E'];
 
 function updateBtnStates(){
-  // Manual buttons only work if we are in Manual Mode AND the port is connected
-  const dis = isAuto || !portActive;
-  ['btn-fwd','btn-bwd','btn-lft','btn-rgt','btn-stop','btn-auger'].forEach(id=>{
+  const dis = !portActive;
+  ['btn-fwd','btn-bwd','btn-lft','btn-rgt','btn-stop','btn-auger-on','btn-auger-off'].forEach(id=>{
     $(id).disabled=dis;
   });
 }
 
-// --- SIMULATED TELEMETRY ---
-setInterval(()=>{
-  if(isAuto && Math.random()<0.2){
-    currentZone = (currentZone+1)%5;
-    logEvent(`Bot advanced to Zone Z-${zones[currentZone]}`, 'ok');
-  }
-  for(let i=0;i<5;i++){
-    const z=$('zone-'+zones[i]);
-    if(i===currentZone){
-      z.style.borderColor='var(--c)';
-      z.style.background='var(--s2)';
-    }else if(i===3){
-      z.style.borderColor='var(--y)';
-      z.style.background='rgba(245,166,35,0.05)';
-    }else{
-      z.style.borderColor='var(--bd2)';
-      z.style.background='var(--s1)';
-    }
-  }
-}, 3000);
-
 // --- WEB SERIAL API (FOR HC-05 COM PORT) ---
 let port;
 let writer;
+
+async function toggleBluetooth() {
+  if(portActive) {
+    await disconnectBluetooth();
+  } else {
+    await connectBluetooth();
+  }
+}
 
 async function connectBluetooth() {
   if (!("serial" in navigator)) {
@@ -305,14 +271,8 @@ async function connectBluetooth() {
     return;
   }
 
-  // Prevent connecting if we are still in AUTO mode
-  if (isAuto) {
-    alert("Switch to MANUAL MODE first before taking Serial control.");
-    return;
-  }
-
   try {
-    logEvent("Requesting COM port for Manual Override...", "wn");
+    logEvent("Requesting COM port...", "wn");
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     
@@ -326,10 +286,9 @@ async function connectBluetooth() {
     $('port-status').textContent = "COM_ACTIVE";
     $('btn-bt').textContent = "DISCONNECT";
     $('btn-bt').style.background = "var(--r)";
-    $('btn-bt').onclick = disconnectBluetooth;
     
     updateBtnStates();
-    logEvent("Successfully connected to bot telemetry", "ok");
+    logEvent("Successfully connected to Bot. Manual control active.", "ok");
 
   } catch (error) {
     logEvent("Connection failed or cancelled", "cr");
@@ -350,19 +309,20 @@ async function disconnectBluetooth() {
   $('port-status').textContent = "DISCONNECTED";
   $('btn-bt').textContent = "CONNECT SERIAL";
   $('btn-bt').style.background = "var(--c2)";
-  $('btn-bt').onclick = connectBluetooth;
+  
   updateBtnStates();
-  logEvent("Disconnected from COM port", "wn");
+  logEvent("Disconnected from COM port. Python script can now connect.", "wn");
 }
 
 async function sendCmd(cmd) {
-  if (isAuto && cmd !== 'S') return; // Only allow Stop in Auto
   if (!portActive || !writer) return;
 
   if (cmd === 'X') {
-    augerOn = !augerOn;
-    $('lv-auger').textContent = augerOn ? 'ACTIVE' : 'OFF';
-    $('lv-auger').style.color = augerOn ? 'var(--y)' : '#FFF';
+    $('lv-auger').textContent = 'ACTIVE';
+    $('lv-auger').style.color = 'var(--y)';
+  } else if (cmd === 'x') {
+    $('lv-auger').textContent = 'OFF';
+    $('lv-auger').style.color = '#FFF';
   }
 
   try {
@@ -372,4 +332,62 @@ async function sendCmd(cmd) {
     logEvent(`TX Error: ${e.message}`, 'cr');
   }
 }
+
+// --- HTML5 GAMEPAD API (XBOX CONTROLLER FOR WEB) ---
+let lastGamepadCmd = "";
+
+function pollGamepad() {
+  requestAnimationFrame(pollGamepad);
+  
+  if (!portActive) return;
+
+  const gamepads = navigator.getGamepads();
+  const gp = gamepads[0]; 
+  
+  if (gp) {
+    let cmd = "S"; 
+
+    // D-Pad (Buttons 12-15) or Left Stick (Axes 0, 1)
+    const up = gp.buttons[12]?.pressed || gp.axes[1] < -0.5;
+    const down = gp.buttons[13]?.pressed || gp.axes[1] > 0.5;
+    const left = gp.buttons[14]?.pressed || gp.axes[0] < -0.5;
+    const right = gp.buttons[15]?.pressed || gp.axes[0] > 0.5;
+    
+    // A Button (0) = Auger ON, B Button (1) or X Button (2) = Auger OFF
+    const startAuger = gp.buttons[0]?.pressed;
+    const stopAuger = gp.buttons[1]?.pressed || gp.buttons[2]?.pressed;
+
+    if (startAuger) {
+      cmd = "X";
+    } else if (stopAuger) {
+      cmd = "x";
+    } else if (up) {
+      cmd = "F";
+    } else if (down) {
+      cmd = "B";
+    } else if (left) {
+      cmd = "L";
+    } else if (right) {
+      cmd = "R";
+    }
+
+    if (cmd !== lastGamepadCmd) {
+      sendCmd(cmd);
+      lastGamepadCmd = cmd;
+    }
+  }
+}
+
+window.addEventListener("gamepadconnected", (e) => {
+  logEvent(`Gamepad Connected: ${e.gamepad.id}`, 'ok');
+  $('gp-status-text').textContent = "CONNECTED";
+  $('gp-status-text').style.color = "var(--c)";
+});
+window.addEventListener("gamepaddisconnected", (e) => {
+  logEvent("Gamepad Disconnected", 'wn');
+  $('gp-status-text').textContent = "NONE";
+  $('gp-status-text').style.color = "var(--r)";
+});
+
+pollGamepad();
 </script>
