@@ -251,7 +251,7 @@ function updateBtnStates(){
   });
 }
 
-// --- WEB SERIAL API (FOR HC-05 COM PORT) ---
+// --- WEB SERIAL API (RAW WRITER FIX) ---
 let port;
 let writer;
 
@@ -275,9 +275,8 @@ async function connectBluetooth() {
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     
-    const textEncoder = new TextEncoderStream();
-    const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
-    writer = textEncoder.writable.getWriter();
+    // FIX: Using raw writer instead of TextEncoderStream to prevent stream drops
+    writer = port.writable.getWriter();
     
     portActive = true;
     $('bt-status-text').textContent = "CONNECTED";
@@ -297,10 +296,12 @@ async function connectBluetooth() {
 
 async function disconnectBluetooth() {
   if (writer) {
-    writer.releaseLock();
+    try { await writer.releaseLock(); } catch(e) {}
+    writer = null;
   }
   if (port) {
-    await port.close();
+    try { await port.close(); } catch(e) {}
+    port = null;
   }
   portActive = false;
   $('bt-status-text').textContent = "DISC";
@@ -327,10 +328,14 @@ async function sendCmd(cmd) {
   }
 
   try {
-    await writer.write(cmd);
+    // FIX: Encode the text manually on the fly to bypass stream pipes
+    const data = new TextEncoder().encode(cmd);
+    await writer.write(data);
     logEvent(`TX Command: ${cmd}`, 'ok');
   } catch (e) {
     logEvent(`TX Error: ${e.message}`, 'cr');
+    // If the writer crashes (Bluetooth drop), auto-disconnect to reset the button
+    await disconnectBluetooth();
   }
 }
 
