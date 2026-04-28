@@ -27,7 +27,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 .hs .hv{color:#FFF;font-size:12px;font-family:'Share Tech Mono',monospace}
 .clock-box{font-family:'Share Tech Mono',monospace;font-size:16px;color:#FFF;min-width:80px;text-align:right}
 
-.body{display:grid;grid-template-columns:180px 1fr 200px;gap:1px;background:var(--bd)}
+.body{display:grid;grid-template-columns:180px 1fr 250px;gap:1px;background:var(--bd)}
 
 .lp{background:var(--s1);padding:12px 0;display:flex;flex-direction:column}
 .lp-sec{padding:8px 12px 4px;font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;font-weight:600}
@@ -44,7 +44,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 .sec-title{font-size:10px;letter-spacing:1px;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:8px;text-transform:uppercase;font-weight:600}
 .sec-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
 
-.env-c{background:var(--s1);border:1px solid var(--bd2);padding:12px;border-radius:4px}
+.env-c{background:var(--s1);border:1px solid var(--bd2);padding:12px;border-radius:4px; transition: all 0.2s ease;}
 .env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .env-c .el{font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;margin-bottom:4px}
 .env-c .ev{font-family:'Share Tech Mono',monospace;font-size:20px;color:#FFF}
@@ -108,7 +108,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   <div class="hdr-stats">
     <div class="hs"><div class="hl">UPTIME</div><div class="hv" id="uptime">04:12:37</div></div>
     <div class="hs"><div class="hl">SECTOR</div><div class="hv">7-GAMMA</div></div>
-    <div class="hs"><div class="hl">SYS STATUS</div><div class="hv" id="threat-lbl" style="color:var(--y)">CAUTION</div></div>
+    <div class="hs"><div class="hl">SYS STATUS</div><div class="hv" id="threat-lbl" style="color:var(--g)">NOMINAL</div></div>
     <div class="clock-box" id="clock">--:--:--</div>
   </div>
 </div>
@@ -147,14 +147,6 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   </div>
 
   <div>
-    <div class="sec-title">WORKER SAFETY DIRECTIVE</div>
-    <div class="env-c" style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(245,166,35,0.05);border-color:var(--y)" id="ws-panel">
-      <div><span class="el" style="color:#FFF">ATMOSPHERE STATUS</span><br><span class="ev" id="ws-status" style="color:var(--y)">CAUTION</span></div>
-      <div style="text-align:right"><span class="el" style="color:#FFF">RECOMMENDED ACTION</span><br><span class="ev" id="ws-action" style="color:var(--y)">VENTILATE AREA</span></div>
-    </div>
-  </div>
-
-  <div>
     <div class="sec-title">SYSTEM EVENT LOG</div>
     <div class="log-box" id="log-box"></div>
   </div>
@@ -184,30 +176,23 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 </div>
 
 <div class="rp">
-  <div class="sec-title">AI VISION ANALYSIS</div>
-  <div class="env-c">
-    <div class="irow"><span class="ik">TARGET CLASSIFICATION</span><span class="iv" id="ai-waste">WET SLUDGE</span></div>
-    <div class="irow"><span class="ik">CURRENT ACTION</span><span class="iv" id="ai-action" style="color:var(--c)">CLEARING</span></div>
-    <div class="irow"><span class="ik">MODEL CONFIDENCE</span><span class="iv" id="ai-conf">92%</span></div>
-    <div class="mtrack" style="margin-top:8px"><div class="mfill mc" id="ai-conf-bar" style="width:92%"></div></div>
+  <div class="sec-title">LIVE TRACKING MAP</div>
+  <div class="env-c" style="padding:0; overflow:hidden; position:relative; height: 180px;">
+    <canvas id="map-canvas" width="220" height="180" style="width:100%; height:100%; display:block;"></canvas>
   </div>
 
-  <div class="sec-title" style="margin-top:8px">POWER DIAGNOSTICS</div>
+  <div class="sec-title" style="margin-top:12px">ENVIRONMENTAL & TELEMETRY</div>
+  <div class="env-grid" style="grid-template-columns:1fr">
+    <div class="env-c" id="dist-panel" style="padding:10px;">
+      <div class="el">ULTRASONIC RANGE</div>
+      <div><span class="ev" id="ev-depth">--</span><span class="eu" style="color:#FFF; font-weight:bold;">cm</span></div>
+    </div>
+  </div>
+  
+  <div class="sec-title" style="margin-top:12px">POWER DIAGNOSTICS</div>
   <div class="meter-block">
     <div><div class="mrow"><span>MAIN CELL</span><span id="mv-batt">87%</span></div><div class="mtrack"><div class="mfill mg" id="mm-batt" style="width:87%"></div></div></div>
     <div><div class="mrow"><span>MOTOR DRAW</span><span id="mv-draw">1.2A</span></div><div class="mtrack"><div class="mfill my" id="mm-draw" style="width:36%"></div></div></div>
-  </div>
-
-  <div class="sec-title" style="margin-top:8px">ENVIRONMENTAL</div>
-  <div class="env-grid" style="grid-template-columns:1fr">
-    <div class="env-c" style="padding:10px">
-      <div class="el">SUBMERSION DEPTH</div>
-      <div><span class="ev" id="ev-depth">4.7</span><span class="eu">m</span></div>
-    </div>
-    <div class="env-c" style="padding:10px">
-      <div class="el">FILTRATION FLOW</div>
-      <div><span class="ev" id="ev-filt">340</span><span class="eu">L/m</span></div>
-    </div>
   </div>
 </div>
 </div>
@@ -218,7 +203,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
     <div class="fi">PORT: <span id="port-status">DISCONNECTED</span></div>
     <div class="fi">BAUD: <span>9600</span></div>
   </div>
-  <div class="f-alert" id="falert" style="color:var(--y)">⚠ VENTILATION ADVISED</div>
+  <div class="f-alert" id="falert" style="color:var(--g)">SYSTEM ONLINE. AWAITING TELEMETRY.</div>
 </div>
 </div>
 
@@ -240,9 +225,8 @@ logEvent('Web Dashboard initialized. Connect Serial for Manual Override.', 'ok')
 
 // --- BOT STATE ---
 let portActive = false;
-let currentZone = 1;
 let augerOn = false; 
-const zones = ['A','B','C','D','E'];
+let latestDistance = 400; // Default max distance
 
 function updateBtnStates(){
   const dis = !portActive;
@@ -251,9 +235,13 @@ function updateBtnStates(){
   });
 }
 
-// --- WEB SERIAL API (RAW WRITER FIX) ---
+// ==========================================
+// WEB SERIAL API (RAW WRITER + READER STREAM)
+// ==========================================
 let port;
 let writer;
+let reader;
+let readLoopActive = false;
 
 async function toggleBluetooth() {
   if(portActive) {
@@ -266,7 +254,6 @@ async function toggleBluetooth() {
 async function connectBluetooth() {
   if (!("serial" in navigator)) {
     alert("Web Serial API not supported. Use Google Chrome or Edge on Desktop.");
-    logEvent("Serial API not supported by browser", "cr");
     return;
   }
 
@@ -275,9 +262,13 @@ async function connectBluetooth() {
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     
-    // FIX: Using raw writer instead of TextEncoderStream to prevent stream drops
+    // Set up Writer
     writer = port.writable.getWriter();
     
+    // Set up Reader (To catch the D:45 telemetry)
+    readLoopActive = true;
+    readSerialLoop();
+
     portActive = true;
     $('bt-status-text').textContent = "CONNECTED";
     $('bt-status-text').style.color = "var(--c)";
@@ -286,7 +277,7 @@ async function connectBluetooth() {
     $('btn-bt').style.background = "var(--r)";
     
     updateBtnStates();
-    logEvent("Successfully connected to Bot. Manual control active.", "ok");
+    logEvent("Successfully connected. Receiving telemetry.", "ok");
 
   } catch (error) {
     logEvent("Connection failed or cancelled", "cr");
@@ -295,6 +286,12 @@ async function connectBluetooth() {
 }
 
 async function disconnectBluetooth() {
+  readLoopActive = false; // Tell reader loop to stop
+  
+  if (reader) {
+    try { await reader.cancel(); } catch(e) {}
+    reader = null;
+  }
   if (writer) {
     try { await writer.releaseLock(); } catch(e) {}
     writer = null;
@@ -303,6 +300,7 @@ async function disconnectBluetooth() {
     try { await port.close(); } catch(e) {}
     port = null;
   }
+  
   portActive = false;
   $('bt-status-text').textContent = "DISC";
   $('bt-status-text').style.color = "var(--r)";
@@ -310,8 +308,68 @@ async function disconnectBluetooth() {
   $('btn-bt').textContent = "CONNECT SERIAL";
   $('btn-bt').style.background = "var(--c2)";
   
+  // Reset UI safety values
+  $('ev-depth').textContent = "--";
+  $('dist-panel').style.borderColor = "var(--bd2)";
+  $('dist-panel').style.background = "var(--s1)";
+  
   updateBtnStates();
-  logEvent("Disconnected from COM port. YOLO can now connect.", "wn");
+  logEvent("Disconnected. YOLO AI can now connect.", "wn");
+}
+
+// --- NEW: THE TELEMETRY READER ---
+async function readSerialLoop() {
+  const textDecoder = new TextDecoderStream();
+  const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+  reader = textDecoder.readable.getReader();
+  let buffer = "";
+
+  try {
+    while (readLoopActive) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      if (value) {
+        buffer += value;
+        let lines = buffer.split('\n');
+        buffer = lines.pop(); // Keep the last incomplete part
+        
+        for (let line of lines) {
+          processIncomingData(line.trim());
+        }
+      }
+    }
+  } catch (error) {
+    console.log("Serial Read Error:", error);
+  } finally {
+    if (reader) reader.releaseLock();
+  }
+}
+
+// Parse the data coming from the Arduino
+function processIncomingData(data) {
+  if (data.startsWith("D:")) {
+    latestDistance = parseInt(data.substring(2));
+    
+    // Update the UI
+    $('ev-depth').textContent = latestDistance;
+    
+    // Safety Alarm Logic
+    if (latestDistance < 60) {
+      // DANGER: Object Close!
+      $('dist-panel').style.borderColor = "var(--r)";
+      $('dist-panel').style.background = "rgba(255,58,58,0.15)";
+      $('ev-depth').style.color = "var(--r)";
+      $('falert').textContent = `⚠ OBSTACLE DETECTED AT ${latestDistance}cm`;
+      $('falert').style.color = "var(--r)";
+    } else {
+      // CLEAR
+      $('dist-panel').style.borderColor = "var(--bd2)";
+      $('dist-panel').style.background = "var(--s1)";
+      $('ev-depth').style.color = "#FFF";
+      $('falert').textContent = "SYSTEM ONLINE. PATH CLEAR.";
+      $('falert').style.color = "var(--g)";
+    }
+  }
 }
 
 async function sendCmd(cmd) {
@@ -327,17 +385,125 @@ async function sendCmd(cmd) {
     $('lv-auger').style.color = '#FFF';
   }
 
+  // Update Bot Map State
+  currentBotCmd = cmd;
+
   try {
-    // FIX: Encode the text manually on the fly to bypass stream pipes
     const data = new TextEncoder().encode(cmd);
     await writer.write(data);
     logEvent(`TX Command: ${cmd}`, 'ok');
   } catch (e) {
     logEvent(`TX Error: ${e.message}`, 'cr');
-    // If the writer crashes (Bluetooth drop), auto-disconnect to reset the button
     await disconnectBluetooth();
   }
 }
+
+// ==========================================
+// NEW: LIVE TRACKING MAP CANVAS LOGIC
+// ==========================================
+const mapC = document.getElementById('map-canvas');
+const mapCtx = mapC.getContext('2d');
+
+// Bot Coordinates
+let botX = mapC.width / 2;
+let botY = mapC.height / 2;
+let botAngle = -Math.PI / 2; // Facing Up (North)
+let currentBotCmd = "S";
+
+// Trail history
+const trail = [];
+
+function drawMap() {
+  mapCtx.clearRect(0, 0, mapC.width, mapC.height);
+
+  // 1. Update Position based on command
+  const speed = 1.0;
+  const turnSpeed = 0.05;
+
+  if (currentBotCmd === 'F') {
+    botX += Math.cos(botAngle) * speed;
+    botY += Math.sin(botAngle) * speed;
+    trail.push({x: botX, y: botY});
+  } else if (currentBotCmd === 'B') {
+    botX -= Math.cos(botAngle) * speed;
+    botY -= Math.sin(botAngle) * speed;
+    trail.push({x: botX, y: botY});
+  } else if (currentBotCmd === 'L') {
+    botAngle -= turnSpeed;
+  } else if (currentBotCmd === 'R') {
+    botAngle += turnSpeed;
+  }
+
+  // Keep trail short
+  if (trail.length > 100) trail.shift();
+  
+  // Wrap around screen if it drives off edge
+  if (botX < 0) botX = mapC.width;
+  if (botX > mapC.width) botX = 0;
+  if (botY < 0) botY = mapC.height;
+  if (botY > mapC.height) botY = 0;
+
+  // 2. Draw Trail
+  mapCtx.beginPath();
+  for (let i = 0; i < trail.length; i++) {
+    if (i === 0) mapCtx.moveTo(trail[i].x, trail[i].y);
+    else mapCtx.lineTo(trail[i].x, trail[i].y);
+  }
+  mapCtx.strokeStyle = 'rgba(0, 229, 188, 0.3)';
+  mapCtx.lineWidth = 2;
+  mapCtx.stroke();
+
+  // 3. Draw Ultrasonic Sensor Cone
+  const coneRange = 60; // Max pixels to draw cone
+  mapCtx.beginPath();
+  mapCtx.moveTo(botX, botY);
+  mapCtx.arc(botX, botY, coneRange, botAngle - 0.4, botAngle + 0.4);
+  mapCtx.closePath();
+  mapCtx.fillStyle = 'rgba(0, 153, 255, 0.1)';
+  mapCtx.fill();
+  mapCtx.strokeStyle = 'rgba(0, 153, 255, 0.3)';
+  mapCtx.stroke();
+
+  // 4. Draw Obstacle Blip (If detected within 60cm)
+  if (latestDistance < 60) {
+    // Map the real-world distance (cm) to pixels inside the cone
+    const blipDist = Math.max(10, latestDistance); 
+    const blipX = botX + Math.cos(botAngle) * blipDist;
+    const blipY = botY + Math.sin(botAngle) * blipDist;
+    
+    mapCtx.beginPath();
+    mapCtx.arc(blipX, blipY, 4, 0, Math.PI * 2);
+    mapCtx.fillStyle = '#FF3A3A'; // Red Alert
+    mapCtx.fill();
+    // Pulse ring
+    mapCtx.beginPath();
+    mapCtx.arc(blipX, blipY, 8 + Math.sin(Date.now()/100)*3, 0, Math.PI * 2);
+    mapCtx.strokeStyle = 'rgba(255, 58, 58, 0.5)';
+    mapCtx.stroke();
+  }
+
+  // 5. Draw the Bot
+  mapCtx.save();
+  mapCtx.translate(botX, botY);
+  mapCtx.rotate(botAngle);
+  
+  // Bot Body
+  mapCtx.beginPath();
+  mapCtx.moveTo(10, 0); // Nose
+  mapCtx.lineTo(-6, -6); // Left Back
+  mapCtx.lineTo(-4, 0);  // Engine indent
+  mapCtx.lineTo(-6, 6);  // Right Back
+  mapCtx.closePath();
+  mapCtx.fillStyle = '#00E5BC';
+  mapCtx.fill();
+  
+  mapCtx.restore();
+
+  requestAnimationFrame(drawMap);
+}
+
+// Start Map Loop
+drawMap();
 
 // ==========================================
 // KEYBOARD CONTROLS (WASD + Spacebar)
@@ -393,13 +559,11 @@ function pollGamepad() {
   if (gp) {
     let cmd = "S"; 
 
-    // D-Pad (Buttons 12-15) or Left Stick (Axes 0, 1)
     const up = gp.buttons[12]?.pressed || gp.axes[1] < -0.5;
     const down = gp.buttons[13]?.pressed || gp.axes[1] > 0.5;
     const left = gp.buttons[14]?.pressed || gp.axes[0] < -0.5;
     const right = gp.buttons[15]?.pressed || gp.axes[0] > 0.5;
     
-    // A Button (0) = Auger ON, B Button (1) or X Button (2) = Auger OFF
     const startAuger = gp.buttons[0]?.pressed;
     const stopAuger = gp.buttons[1]?.pressed || gp.buttons[2]?.pressed;
 
