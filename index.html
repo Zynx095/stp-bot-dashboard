@@ -125,6 +125,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   <div class="lp-sec">COMMS LINK</div>
   <div class="lp-item"><span class="mi">bluetooth</span>HC-05 Status<span class="lp-val" id="bt-status-text" style="color:var(--r)">DISC</span></div>
   <div class="lp-item"><span class="mi">sports_esports</span>Gamepad<span class="lp-val" id="gp-status-text" style="color:var(--r)">NONE</span></div>
+  <div class="lp-item"><span class="mi">keyboard</span>Keyboard<span class="lp-val" style="color:var(--c)">READY</span></div>
 </div>
 
 <div class="cp">
@@ -163,23 +164,23 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 
   <div>
     <div class="sec-title" style="display:flex;justify-content:space-between">
-      <span>BOT TELEOPERATION LINK</span>
+      <span>BOT TELEOPERATION LINK (CONTROLS: WASD / SPACEBAR / XBOX)</span>
       <button onclick="toggleBluetooth()" id="btn-bt" style="background:var(--c2);color:#000;border:none;padding:4px 8px;border-radius:2px;font-family:'Share Tech Mono';cursor:pointer;font-weight:bold">CONNECT SERIAL</button>
     </div>
     
     <div style="display:flex;gap:8px;margin-bottom:8px">
-      <button class="cbtn" onmousedown="sendCmd('X')" id="btn-auger-on" disabled style="flex:1; border-color:var(--y)"><span class="ci2" style="color:var(--y)">autorenew</span>AUGER ON (X)</button>
-      <button class="cbtn" onmousedown="sendCmd('x')" id="btn-auger-off" disabled style="flex:1; border-color:var(--r)"><span class="ci2" style="color:var(--r)">block</span>AUGER OFF (x)</button>
+      <button class="cbtn" onmousedown="sendCmd('X')" id="btn-auger-on" disabled style="flex:1; border-color:var(--y)"><span class="ci2" style="color:var(--y)">autorenew</span>AUGER ON (Space)</button>
+      <button class="cbtn" onmousedown="sendCmd('x')" id="btn-auger-off" disabled style="flex:1; border-color:var(--r)"><span class="ci2" style="color:var(--r)">block</span>AUGER OFF (Space)</button>
     </div>
     <div class="ctrl-row" style="grid-template-columns:repeat(3,1fr)">
       <div></div>
-      <button class="cbtn" onmousedown="sendCmd('F')" onmouseup="sendCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD (F)</button>
+      <button class="cbtn" onmousedown="sendCmd('F')" onmouseup="sendCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD (W)</button>
       <div></div>
-      <button class="cbtn" onmousedown="sendCmd('L')" onmouseup="sendCmd('S')" id="btn-lft" disabled><span class="ci2">arrow_back</span>LEFT (L)</button>
+      <button class="cbtn" onmousedown="sendCmd('L')" onmouseup="sendCmd('S')" id="btn-lft" disabled><span class="ci2">arrow_back</span>LEFT (A)</button>
       <button class="cbtn" onclick="sendCmd('S')" id="btn-stop" disabled style="border-color:var(--r)"><span class="ci2" style="color:var(--r)">stop</span>STOP (S)</button>
-      <button class="cbtn" onmousedown="sendCmd('R')" onmouseup="sendCmd('S')" id="btn-rgt" disabled><span class="ci2">arrow_forward</span>RIGHT (R)</button>
+      <button class="cbtn" onmousedown="sendCmd('R')" onmouseup="sendCmd('S')" id="btn-rgt" disabled><span class="ci2">arrow_forward</span>RIGHT (D)</button>
       <div></div>
-      <button class="cbtn" onmousedown="sendCmd('B')" onmouseup="sendCmd('S')" id="btn-bwd" disabled><span class="ci2">arrow_downward</span>REV (B)</button>
+      <button class="cbtn" onmousedown="sendCmd('B')" onmouseup="sendCmd('S')" id="btn-bwd" disabled><span class="ci2">arrow_downward</span>REV (S)</button>
       <div></div>
     </div>
   </div>
@@ -243,6 +244,7 @@ logEvent('Web Dashboard initialized. Ready for Manual Override.', 'ok');
 // --- BOT STATE ---
 let portActive = false;
 let currentZone = 1;
+let augerOn = false; 
 const zones = ['A','B','C','D','E'];
 
 function updateBtnStates(){
@@ -318,9 +320,11 @@ async function sendCmd(cmd) {
   if (!portActive || !writer) return;
 
   if (cmd === 'X') {
+    augerOn = true;
     $('lv-auger').textContent = 'ACTIVE';
     $('lv-auger').style.color = 'var(--y)';
   } else if (cmd === 'x') {
+    augerOn = false;
     $('lv-auger').textContent = 'OFF';
     $('lv-auger').style.color = '#FFF';
   }
@@ -333,7 +337,50 @@ async function sendCmd(cmd) {
   }
 }
 
-// --- HTML5 GAMEPAD API (XBOX CONTROLLER FOR WEB) ---
+// ==========================================
+// KEYBOARD CONTROLS (WASD + Spacebar)
+// ==========================================
+let activeKey = null;
+
+window.addEventListener('keydown', (e) => {
+  if (!portActive || e.repeat) return; // Ignore if disconnected or key is held down (prevent auto-repeat spam)
+  
+  const key = e.key.toLowerCase();
+  
+  // Drive Controls (WASD)
+  if (['w', 'a', 's', 'd'].includes(key)) {
+    activeKey = key;
+    if (key === 'w') sendCmd('F');
+    if (key === 's') sendCmd('B');
+    if (key === 'a') sendCmd('L');
+    if (key === 'd') sendCmd('R');
+  }
+
+  // Auger Toggle (Spacebar)
+  if (key === ' ' || e.code === 'Space') {
+    e.preventDefault(); // Stop the webpage from scrolling down when space is pressed
+    if (!augerOn) {
+      sendCmd('X'); // Turn ON
+    } else {
+      sendCmd('x'); // Turn OFF
+    }
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  if (!portActive) return;
+  const key = e.key.toLowerCase();
+  
+  // Only send STOP if the key we just released was the one driving the bot
+  if (key === activeKey) {
+    sendCmd('S');
+    activeKey = null;
+  }
+});
+
+// ==========================================
+// HTML5 GAMEPAD API (XBOX CONTROLLER FOR WEB)
+// ==========================================
 let lastGamepadCmd = "";
 
 function pollGamepad() {
@@ -357,9 +404,9 @@ function pollGamepad() {
     const startAuger = gp.buttons[0]?.pressed;
     const stopAuger = gp.buttons[1]?.pressed || gp.buttons[2]?.pressed;
 
-    if (startAuger) {
+    if (startAuger && !augerOn) {
       cmd = "X";
-    } else if (stopAuger) {
+    } else if (stopAuger && augerOn) {
       cmd = "x";
     } else if (up) {
       cmd = "F";
@@ -369,6 +416,9 @@ function pollGamepad() {
       cmd = "L";
     } else if (right) {
       cmd = "R";
+    } else if (startAuger || stopAuger) {
+      // Prevent Stop command from overwriting while holding auger buttons
+      return; 
     }
 
     if (cmd !== lastGamepadCmd) {
