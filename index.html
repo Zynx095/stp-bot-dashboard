@@ -44,13 +44,11 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 .sec-title{font-size:10px;letter-spacing:1px;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:8px;text-transform:uppercase;font-weight:600}
 .sec-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
 
-.env-c{background:var(--s1);border:1px solid var(--bd2);padding:12px;border-radius:4px}
+.env-c{background:var(--s1);border:1px solid var(--bd2);padding:12px;border-radius:4px; transition:0.3s;}
 .env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .env-c .el{font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;margin-bottom:4px}
 .env-c .ev{font-family:'Share Tech Mono',monospace;font-size:20px;color:#FFF}
 .env-c .eu{font-size:10px;color:#888;margin-left:2px}
-.env-c .ebar{height:3px;background:var(--s3);margin-top:8px;border-radius:2px}
-.env-c .ebf{height:100%;border-radius:2px}
 
 .log-box{background:var(--s1);border:1px solid var(--bd2);padding:8px 12px;height:80px;overflow-y:auto;border-radius:4px;font-family:'Share Tech Mono',monospace}
 .ll{font-size:10px;line-height:1.6;display:flex;gap:8px}
@@ -67,15 +65,6 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 .rp{background:var(--s1);padding:16px;display:flex;flex-direction:column;gap:12px}
 .irow{display:flex;justify-content:space-between;font-size:10px;margin-bottom:6px;font-family:'Share Tech Mono',monospace}
 .ik{color:#888}.iv{color:#FFF}
-
-.meter-block{display:flex;flex-direction:column;gap:8px}
-.mrow{display:flex;justify-content:space-between;font-size:10px;color:#888;margin-bottom:4px;font-family:'Share Tech Mono',monospace}
-.mrow span:last-child{color:#FFF}
-.mtrack{height:4px;background:var(--s3);border-radius:2px}
-.mfill{height:100%;border-radius:2px}
-.mfill.mc{background:var(--c2)}
-.mfill.my{background:var(--y)}
-.mfill.mg{background:var(--g)}
 
 .ftr{background:var(--s1);border-top:1px solid var(--bd);padding:8px 16px;display:flex;justify-content:space-between;align-items:center}
 .f-left{display:flex;gap:24px}
@@ -95,7 +84,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   <div class="hdr-stats">
     <div class="hs"><div class="hl">UPTIME</div><div class="hv" id="uptime">04:12:37</div></div>
     <div class="hs"><div class="hl">SECTOR</div><div class="hv">7-GAMMA</div></div>
-    <div class="hs"><div class="hl">SYS STATUS</div><div class="hv" id="threat-lbl" style="color:var(--c)">ONLINE</div></div>
+    <div class="hs"><div class="hl">SYS STATUS</div><div class="hv" id="threat-lbl" style="color:var(--g)">NOMINAL</div></div>
     <div class="clock-box" id="clock">--:--:--</div>
   </div>
 </div>
@@ -105,13 +94,11 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   <div class="lp-sec">SYSTEM</div>
   <div class="lp-item on"><span class="mi">dashboard</span>Overview</div>
   <div class="lp-item"><span class="mi">battery_charging_full</span>Main Battery<span class="lp-val" id="lv-batt" style="color:var(--g)">87%</span></div>
-  <div class="lp-bar"><div class="lp-bar-f" id="lb-batt" style="width:87%;background:var(--g)"></div></div>
   <div class="lp-divider"></div>
   
   <div class="lp-sec">BOT HARDWARE</div>
   <div class="lp-item"><span class="mi">settings</span>Drive Motors<span class="lp-val" style="color:var(--g)">OK</span></div>
   <div class="lp-item"><span class="mi">autorenew</span>Auger System<span class="lp-val" id="lv-auger" style="color:#FFF">OFF</span></div>
-  <div class="lp-item"><span class="mi">campaign</span>Buzzer<span class="lp-val" id="lv-buzzer" style="color:#FFF">OFF</span></div>
   <div class="lp-divider"></div>
   
   <div class="lp-sec">COMMS LINK</div>
@@ -121,20 +108,9 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
 </div>
 
 <div class="cp">
-  
-  <div>
-    <div class="sec-title">ULTRASONIC & AUDIO CONTROLS</div>
-    <div class="env-c" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-color:var(--c);">
-      <div>
-        <span class="el" style="color:#888">RANGE DETECTED</span><br>
-        <span class="ev" id="dist-val" style="color:var(--c); font-size:28px;">-- cm</span>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button class="cbtn" onmousedown="queueCmd('Z')" onmouseup="queueCmd('z')" id="btn-buzz" disabled style="padding:16px 24px; border-color:var(--y); color:var(--y); font-size:14px; font-weight:bold;">
-          <span class="ci2" style="display:inline; margin-bottom:0; margin-right:8px;">campaign</span>SOUND HORN (H)
-        </button>
-      </div>
-    </div>
+  <div class="env-c" id="range-box" style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-color:var(--c)">
+    <div><span class="el" style="color:#FFF">ULTRASONIC SENSOR RANGE</span><br><span class="ev" id="range-status" style="color:var(--c)">CLEAR</span></div>
+    <div style="text-align:right"><span class="el" style="color:#FFF">DISTANCE</span><br><span class="ev" id="range-val" style="color:var(--c); font-size:28px;">--</span> <span style="color:#888">cm</span></div>
   </div>
 
   <div>
@@ -151,7 +127,10 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <button class="cbtn" onmousedown="queueCmd('X')" id="btn-auger-on" disabled style="flex:1; border-color:var(--y)"><span class="ci2" style="color:var(--y)">autorenew</span>AUGER ON (Space)</button>
       <button class="cbtn" onmousedown="queueCmd('x')" id="btn-auger-off" disabled style="flex:1; border-color:var(--r)"><span class="ci2" style="color:var(--r)">block</span>AUGER OFF (Space)</button>
+      
+      <button class="cbtn" onmousedown="queueCmd('Z')" onmouseup="queueCmd('z')" id="btn-buzz" disabled style="flex:1; border-color:var(--c2)"><span class="ci2" style="color:var(--c2)">campaign</span>SOUND HORN (H)</button>
     </div>
+    
     <div class="ctrl-row" style="grid-template-columns:repeat(3,1fr)">
       <div></div>
       <button class="cbtn" onmousedown="queueCmd('F')" onmouseup="queueCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD (W)</button>
@@ -171,14 +150,6 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
   <div class="env-c">
     <div class="irow"><span class="ik">TARGET CLASSIFICATION</span><span class="iv" id="ai-waste">WET SLUDGE</span></div>
     <div class="irow"><span class="ik">CURRENT ACTION</span><span class="iv" id="ai-action" style="color:var(--c)">CLEARING</span></div>
-    <div class="irow"><span class="ik">MODEL CONFIDENCE</span><span class="iv" id="ai-conf">92%</span></div>
-    <div class="mtrack" style="margin-top:8px"><div class="mfill mc" id="ai-conf-bar" style="width:92%"></div></div>
-  </div>
-
-  <div class="sec-title" style="margin-top:8px">POWER DIAGNOSTICS</div>
-  <div class="meter-block">
-    <div><div class="mrow"><span>MAIN CELL</span><span id="mv-batt">87%</span></div><div class="mtrack"><div class="mfill mg" id="mm-batt" style="width:87%"></div></div></div>
-    <div><div class="mrow"><span>MOTOR DRAW</span><span id="mv-draw">1.2A</span></div><div class="mtrack"><div class="mfill my" id="mm-draw" style="width:36%"></div></div></div>
   </div>
 </div>
 </div>
@@ -189,7 +160,7 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
     <div class="fi">PORT: <span id="port-status">DISCONNECTED</span></div>
     <div class="fi">BAUD: <span>9600</span></div>
   </div>
-  <div class="f-alert" id="falert" style="color:var(--g)">SYSTEM NOMINAL</div>
+  <div class="f-alert" id="falert" style="color:var(--g)">SYSTEM ONLINE. AWAITING TELEMETRY.</div>
 </div>
 </div>
 
@@ -215,7 +186,7 @@ let augerOn = false;
 
 function updateBtnStates(){
   const dis = !portActive;
-  ['btn-fwd','btn-bwd','btn-lft','btn-rgt','btn-stop','btn-auger-on','btn-auger-off', 'btn-buzz'].forEach(id=>{
+  ['btn-fwd','btn-bwd','btn-lft','btn-rgt','btn-stop','btn-auger-on','btn-auger-off','btn-buzz'].forEach(id=>{
     $(id).disabled=dis;
   });
 }
@@ -245,13 +216,10 @@ async function connectBluetooth() {
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     
-    // Set up Writer
+    // Writer
     writer = port.writable.getWriter();
     
-    // Set up Reader (To catch the Arduino D:45 distance text)
-    const textDecoder = new TextDecoderStream();
-    port.readable.pipeTo(textDecoder.writable);
-    reader = textDecoder.readable.getReader();
+    // NEW: Reader to catch telemetry
     readLoopActive = true;
     readSerialLoop();
     
@@ -263,7 +231,7 @@ async function connectBluetooth() {
     $('btn-bt').style.background = "var(--r)";
     
     updateBtnStates();
-    logEvent("Successfully connected to Bot.", "ok");
+    logEvent("Connected. Telemetry stream open.", "ok");
 
   } catch (error) {
     logEvent("Connection failed", "cr");
@@ -271,8 +239,7 @@ async function connectBluetooth() {
 }
 
 async function disconnectBluetooth() {
-  readLoopActive = false; // Stop reader
-  
+  readLoopActive = false;
   if (reader) { try { await reader.cancel(); } catch(e) {} reader = null; }
   if (writer) { try { await writer.releaseLock(); } catch(e) {} writer = null; }
   if (port) { try { await port.close(); } catch(e) {} port = null; }
@@ -284,16 +251,24 @@ async function disconnectBluetooth() {
   $('btn-bt').textContent = "CONNECT SERIAL";
   $('btn-bt').style.background = "var(--c2)";
   
-  $('dist-val').textContent = "-- cm";
-  $('dist-val').style.color = "var(--c)";
+  // Reset UI
+  $('range-val').textContent = "--";
+  $('range-box').style.borderColor = "var(--bd2)";
+  $('range-box').style.background = "var(--s1)";
   
   updateBtnStates();
   logEvent("Disconnected.", "wn");
 }
 
-// --- NEW: THE TELEMETRY READER LOOP ---
+// ==========================================
+// NEW: TELEMETRY READER
+// ==========================================
 async function readSerialLoop() {
+  const textDecoder = new TextDecoderStream();
+  const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+  reader = textDecoder.readable.getReader();
   let buffer = "";
+
   try {
     while (readLoopActive) {
       const { value, done } = await reader.read();
@@ -301,48 +276,55 @@ async function readSerialLoop() {
       if (value) {
         buffer += value;
         let lines = buffer.split('\n');
-        buffer = lines.pop(); // keep the last incomplete chunk in the buffer
+        buffer = lines.pop(); // Keep incomplete line
         
         for (let line of lines) {
-          line = line.trim();
-          if (line.startsWith("D:")) {
-            const dist = parseInt(line.substring(2));
+          let txt = line.trim();
+          if (txt.startsWith("D:")) {
+            let dist = parseInt(txt.substring(2));
+            $('range-val').textContent = dist;
             
-            // Update Dashboard
-            $('dist-val').textContent = dist + ' cm';
-            
-            if (dist < 60 && dist > 20) {
-              $('dist-val').style.color = "var(--r)";
-              $('falert').textContent = `⚠ OBSTACLE DETECTED AT ${dist}cm`;
-              $('falert').style.color = "var(--y)";
+            // Visual Alarms
+            if(dist > 0 && dist < 60) {
+              $('range-box').style.borderColor = "var(--r)";
+              $('range-box').style.background = "rgba(255,58,58,0.1)";
+              $('range-status').textContent = "OBSTACLE DETECTED";
+              $('range-status').style.color = "var(--r)";
+              $('range-val').style.color = "var(--r)";
             } else {
-              $('dist-val').style.color = "var(--c)";
-              $('falert').textContent = "SYSTEM NOMINAL";
-              $('falert').style.color = "var(--g)";
+              $('range-box').style.borderColor = "var(--c)";
+              $('range-box').style.background = "var(--s1)";
+              $('range-status').textContent = "CLEAR";
+              $('range-status').style.color = "var(--c)";
+              $('range-val').style.color = "var(--c)";
             }
           }
         }
       }
     }
   } catch (error) {
-    console.log("Read error:", error);
+    console.log(error);
+  } finally {
+    if (reader) reader.releaseLock();
   }
 }
 
-// --- QUEUE SYSTEM ---
+// ==========================================
+// THE ASYNC QUEUE SYSTEM (Prevents crashes)
+// ==========================================
 const commandQueue = [];
 let isWriting = false;
 
 async function processQueue() {
   if (isWriting || commandQueue.length === 0 || !writer || !portActive) return;
-  
   isWriting = true;
   const cmd = commandQueue.shift();
 
   try {
     const data = new TextEncoder().encode(cmd);
     await writer.write(data);
-    logEvent(`TX: ${cmd}`, 'ok');
+    // Don't log S (Stop) so we don't spam the UI
+    if(cmd !== 'S') logEvent(`TX: ${cmd}`, 'ok');
   } catch (e) {
     logEvent(`TX Error! Disconnecting.`, 'cr');
     await disconnectBluetooth();
@@ -354,34 +336,17 @@ async function processQueue() {
 
 function queueCmd(cmd) {
   if (!portActive) return;
-
-  // UI Updates
-  if (cmd === 'X') {
-    augerOn = true;
-    $('lv-auger').textContent = 'ACTIVE';
-    $('lv-auger').style.color = 'var(--y)';
-  } else if (cmd === 'x') {
-    augerOn = false;
-    $('lv-auger').textContent = 'OFF';
-    $('lv-auger').style.color = '#FFF';
-  } else if (cmd === 'Z') {
-    $('lv-buzzer').textContent = 'ACTIVE';
-    $('lv-buzzer').style.color = 'var(--y)';
-    $('btn-buzz').style.background = 'var(--y)';
-    $('btn-buzz').style.color = '#000';
-  } else if (cmd === 'z') {
-    $('lv-buzzer').textContent = 'OFF';
-    $('lv-buzzer').style.color = '#FFF';
-    $('btn-buzz').style.background = 'var(--s2)';
-    $('btn-buzz').style.color = 'var(--y)';
-  }
-
+  if (cmd === 'X') { augerOn = true; $('lv-auger').textContent = 'ACTIVE'; $('lv-auger').style.color = 'var(--y)'; }
+  else if (cmd === 'x') { augerOn = false; $('lv-auger').textContent = 'OFF'; $('lv-auger').style.color = '#FFF'; }
+  
   commandQueue.push(cmd);
   processQueue();
 }
 
-// --- KEYBOARD CONTROLS (WASD + Spacebar + H) ---
-let activeDriveKey = null;
+// ==========================================
+// KEYBOARD CONTROLS (WASD + Spacebar + H)
+// ==========================================
+let activeKey = null;
 let hornActive = false;
 
 window.addEventListener('keydown', (e) => {
@@ -389,42 +354,40 @@ window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
   
   if (['w', 'a', 's', 'd'].includes(key)) {
-    activeDriveKey = key;
+    activeKey = key;
     if (key === 'w') queueCmd('F');
     if (key === 's') queueCmd('B');
     if (key === 'a') queueCmd('L');
     if (key === 'd') queueCmd('R');
   }
-
-  if (key === ' ' || e.code === 'Space') {
-    e.preventDefault(); 
-    if (!augerOn) queueCmd('X'); 
-    else queueCmd('x'); 
-  }
+  if (key === ' ') { e.preventDefault(); if (!augerOn) queueCmd('X'); else queueCmd('x'); }
   
-  if (key === 'h') {
+  // Horn Keyboard control
+  if (key === 'h' && !hornActive) {
     hornActive = true;
-    queueCmd('Z'); // Horn ON
+    queueCmd('Z');
   }
 });
 
 window.addEventListener('keyup', (e) => {
   if (!portActive) return;
   const key = e.key.toLowerCase();
-  
-  if (key === activeDriveKey) {
+  if (key === activeKey) {
     queueCmd('S');
-    activeDriveKey = null;
+    activeKey = null;
   }
-  
-  if (key === 'h' && hornActive) {
+  // Release horn
+  if (key === 'h') {
     hornActive = false;
-    queueCmd('z'); // Horn OFF
+    queueCmd('z');
   }
 });
 
-// --- XBOX CONTROLLER ---
+// ==========================================
+// HTML5 GAMEPAD API (XBOX CONTROLLER)
+// ==========================================
 let lastGamepadCmd = "";
+let lastHornState = false;
 
 function pollGamepad() {
   requestAnimationFrame(pollGamepad);
@@ -442,17 +405,27 @@ function pollGamepad() {
     
     const startAuger = gp.buttons[0]?.pressed;
     const stopAuger = gp.buttons[1]?.pressed || gp.buttons[2]?.pressed;
-    const hornButton = gp.buttons[3]?.pressed; // Y Button for Horn
+    
+    // Y Button (3) for Horn
+    const hornPressed = gp.buttons[3]?.pressed;
 
+    // Horn Logic
+    if (hornPressed && !lastHornState) {
+      queueCmd('Z');
+      lastHornState = true;
+    } else if (!hornPressed && lastHornState) {
+      queueCmd('z');
+      lastHornState = false;
+    }
+
+    // Drive Logic
     if (startAuger && !augerOn) cmd = "X";
     else if (stopAuger && augerOn) cmd = "x";
-    else if (hornButton && !hornActive) { cmd = "Z"; hornActive = true; } // Horn ON
-    else if (!hornButton && hornActive) { cmd = "z"; hornActive = false; } // Horn OFF
     else if (up) cmd = "F";
     else if (down) cmd = "B";
     else if (left) cmd = "L";
     else if (right) cmd = "R";
-    else if (startAuger || stopAuger || hornButton) return; 
+    else if (startAuger || stopAuger || hornPressed) return; 
 
     if (cmd !== lastGamepadCmd) {
       queueCmd(cmd);
@@ -461,15 +434,14 @@ function pollGamepad() {
   }
 }
 
-window.addEventListener("gamepadconnected", () => {
+window.addEventListener("gamepadconnected", (e) => {
+  logEvent(`Gamepad Connected`, 'ok');
   $('gp-status-text').textContent = "CONNECTED";
   $('gp-status-text').style.color = "var(--c)";
-  logEvent("Xbox Controller Connected.");
 });
-window.addEventListener("gamepaddisconnected", () => {
-  $('gp-status-text').textContent = "DISCONNECTED";
+window.addEventListener("gamepaddisconnected", (e) => {
+  $('gp-status-text').textContent = "NONE";
   $('gp-status-text').style.color = "var(--r)";
-  logEvent("Xbox Controller Disconnected.");
 });
 
 pollGamepad();
