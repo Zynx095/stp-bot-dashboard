@@ -166,18 +166,18 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
     </div>
     
     <div style="display:flex;gap:8px;margin-bottom:8px">
-      <button class="cbtn" onmousedown="sendCmd('X')" id="btn-auger-on" disabled style="flex:1; border-color:var(--y)"><span class="ci2" style="color:var(--y)">autorenew</span>AUGER ON (Space)</button>
-      <button class="cbtn" onmousedown="sendCmd('x')" id="btn-auger-off" disabled style="flex:1; border-color:var(--r)"><span class="ci2" style="color:var(--r)">block</span>AUGER OFF (Space)</button>
+      <button class="cbtn" onmousedown="queueCmd('X')" id="btn-auger-on" disabled style="flex:1; border-color:var(--y)"><span class="ci2" style="color:var(--y)">autorenew</span>AUGER ON (Space)</button>
+      <button class="cbtn" onmousedown="queueCmd('x')" id="btn-auger-off" disabled style="flex:1; border-color:var(--r)"><span class="ci2" style="color:var(--r)">block</span>AUGER OFF (Space)</button>
     </div>
     <div class="ctrl-row" style="grid-template-columns:repeat(3,1fr)">
       <div></div>
-      <button class="cbtn" onmousedown="sendCmd('F')" onmouseup="sendCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD (W)</button>
+      <button class="cbtn" onmousedown="queueCmd('F')" onmouseup="queueCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD (W)</button>
       <div></div>
-      <button class="cbtn" onmousedown="sendCmd('L')" onmouseup="sendCmd('S')" id="btn-lft" disabled><span class="ci2">arrow_back</span>LEFT (A)</button>
-      <button class="cbtn" onclick="sendCmd('S')" id="btn-stop" disabled style="border-color:var(--r)"><span class="ci2" style="color:var(--r)">stop</span>STOP (S)</button>
-      <button class="cbtn" onmousedown="sendCmd('R')" onmouseup="sendCmd('S')" id="btn-rgt" disabled><span class="ci2">arrow_forward</span>RIGHT (D)</button>
+      <button class="cbtn" onmousedown="queueCmd('L')" onmouseup="queueCmd('S')" id="btn-lft" disabled><span class="ci2">arrow_back</span>LEFT (A)</button>
+      <button class="cbtn" onclick="queueCmd('S')" id="btn-stop" disabled style="border-color:var(--r)"><span class="ci2" style="color:var(--r)">stop</span>STOP (S)</button>
+      <button class="cbtn" onmousedown="queueCmd('R')" onmouseup="queueCmd('S')" id="btn-rgt" disabled><span class="ci2">arrow_forward</span>RIGHT (D)</button>
       <div></div>
-      <button class="cbtn" onmousedown="sendCmd('B')" onmouseup="sendCmd('S')" id="btn-bwd" disabled><span class="ci2">arrow_downward</span>REV (S)</button>
+      <button class="cbtn" onmousedown="queueCmd('B')" onmouseup="queueCmd('S')" id="btn-bwd" disabled><span class="ci2">arrow_downward</span>REV (S)</button>
       <div></div>
     </div>
   </div>
@@ -236,13 +236,11 @@ function logEvent(msg, type='ok'){
   if(logs.length>20) logs.pop();
   $('log-box').innerHTML=logs.map(l=>`<div class="ll"><span class="lt">${l.t}</span><span class="lm ${l.c}">${l.m}</span></div>`).join('');
 }
-logEvent('Web Dashboard initialized. Connect Serial for Manual Override.', 'ok');
+logEvent('Web Dashboard initialized. Ready.', 'ok');
 
 // --- BOT STATE ---
 let portActive = false;
-let currentZone = 1;
 let augerOn = false; 
-const zones = ['A','B','C','D','E'];
 
 function updateBtnStates(){
   const dis = !portActive;
@@ -251,7 +249,7 @@ function updateBtnStates(){
   });
 }
 
-// --- WEB SERIAL API (RAW WRITER FIX) ---
+// --- WEB SERIAL API ---
 let port;
 let writer;
 
@@ -265,8 +263,8 @@ async function toggleBluetooth() {
 
 async function connectBluetooth() {
   if (!("serial" in navigator)) {
-    alert("Web Serial API not supported. Use Google Chrome or Edge on Desktop.");
-    logEvent("Serial API not supported by browser", "cr");
+    alert("Web Serial API not supported. Use Google Chrome Desktop.");
+    logEvent("Serial API not supported", "cr");
     return;
   }
 
@@ -275,7 +273,6 @@ async function connectBluetooth() {
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     
-    // FIX: Using raw writer instead of TextEncoderStream to prevent stream drops
     writer = port.writable.getWriter();
     
     portActive = true;
@@ -286,7 +283,7 @@ async function connectBluetooth() {
     $('btn-bt').style.background = "var(--r)";
     
     updateBtnStates();
-    logEvent("Successfully connected to Bot. Manual control active.", "ok");
+    logEvent("Successfully connected to Bot.", "ok");
 
   } catch (error) {
     logEvent("Connection failed or cancelled", "cr");
@@ -311,12 +308,42 @@ async function disconnectBluetooth() {
   $('btn-bt').style.background = "var(--c2)";
   
   updateBtnStates();
-  logEvent("Disconnected from COM port. YOLO can now connect.", "wn");
+  logEvent("Disconnected.", "wn");
 }
 
-async function sendCmd(cmd) {
-  if (!portActive || !writer) return;
+// ==========================================
+// FIX: THE ASYNC QUEUE SYSTEM
+// This prevents Chrome from crashing if commands are sent too fast
+// ==========================================
+const commandQueue = [];
+let isWriting = false;
 
+async function processQueue() {
+  if (isWriting || commandQueue.length === 0 || !writer || !portActive) return;
+  
+  isWriting = true;
+  const cmd = commandQueue.shift();
+
+  try {
+    const data = new TextEncoder().encode(cmd);
+    await writer.write(data);
+    logEvent(`TX: ${cmd}`, 'ok');
+  } catch (e) {
+    logEvent(`TX Error: Stream Crash! Disconnecting.`, 'cr');
+    await disconnectBluetooth();
+  } finally {
+    isWriting = false;
+    // Process next command in line
+    if (commandQueue.length > 0) {
+      processQueue();
+    }
+  }
+}
+
+function queueCmd(cmd) {
+  if (!portActive) return;
+
+  // Update UI instantly
   if (cmd === 'X') {
     augerOn = true;
     $('lv-auger').textContent = 'ACTIVE';
@@ -327,16 +354,9 @@ async function sendCmd(cmd) {
     $('lv-auger').style.color = '#FFF';
   }
 
-  try {
-    // FIX: Encode the text manually on the fly to bypass stream pipes
-    const data = new TextEncoder().encode(cmd);
-    await writer.write(data);
-    logEvent(`TX Command: ${cmd}`, 'ok');
-  } catch (e) {
-    logEvent(`TX Error: ${e.message}`, 'cr');
-    // If the writer crashes (Bluetooth drop), auto-disconnect to reset the button
-    await disconnectBluetooth();
-  }
+  // Push to safe queue
+  commandQueue.push(cmd);
+  processQueue();
 }
 
 // ==========================================
@@ -346,33 +366,28 @@ let activeKey = null;
 
 window.addEventListener('keydown', (e) => {
   if (!portActive || e.repeat) return; 
-  
   const key = e.key.toLowerCase();
   
   if (['w', 'a', 's', 'd'].includes(key)) {
     activeKey = key;
-    if (key === 'w') sendCmd('F');
-    if (key === 's') sendCmd('B');
-    if (key === 'a') sendCmd('L');
-    if (key === 'd') sendCmd('R');
+    if (key === 'w') queueCmd('F');
+    if (key === 's') queueCmd('B');
+    if (key === 'a') queueCmd('L');
+    if (key === 'd') queueCmd('R');
   }
 
   if (key === ' ' || e.code === 'Space') {
     e.preventDefault(); 
-    if (!augerOn) {
-      sendCmd('X'); 
-    } else {
-      sendCmd('x'); 
-    }
+    if (!augerOn) queueCmd('X'); 
+    else queueCmd('x'); 
   }
 });
 
 window.addEventListener('keyup', (e) => {
   if (!portActive) return;
   const key = e.key.toLowerCase();
-  
   if (key === activeKey) {
-    sendCmd('S');
+    queueCmd('S');
     activeKey = null;
   }
 });
@@ -384,22 +399,19 @@ let lastGamepadCmd = "";
 
 function pollGamepad() {
   requestAnimationFrame(pollGamepad);
-  
   if (!portActive) return;
 
-  const gamepads = navigator.getGamepads();
-  const gp = gamepads[0]; 
+  const gp = navigator.getGamepads()[0]; 
   
   if (gp) {
     let cmd = "S"; 
 
-    // D-Pad (Buttons 12-15) or Left Stick (Axes 0, 1)
-    const up = gp.buttons[12]?.pressed || gp.axes[1] < -0.5;
-    const down = gp.buttons[13]?.pressed || gp.axes[1] > 0.5;
-    const left = gp.buttons[14]?.pressed || gp.axes[0] < -0.5;
-    const right = gp.buttons[15]?.pressed || gp.axes[0] > 0.5;
+    // Increased deadzone from 0.5 to 0.65 to prevent flicker crashing
+    const up = gp.buttons[12]?.pressed || gp.axes[1] < -0.65;
+    const down = gp.buttons[13]?.pressed || gp.axes[1] > 0.65;
+    const left = gp.buttons[14]?.pressed || gp.axes[0] < -0.65;
+    const right = gp.buttons[15]?.pressed || gp.axes[0] > 0.65;
     
-    // A Button (0) = Auger ON, B Button (1) or X Button (2) = Auger OFF
     const startAuger = gp.buttons[0]?.pressed;
     const stopAuger = gp.buttons[1]?.pressed || gp.buttons[2]?.pressed;
 
@@ -420,7 +432,7 @@ function pollGamepad() {
     }
 
     if (cmd !== lastGamepadCmd) {
-      sendCmd(cmd);
+      queueCmd(cmd);
       lastGamepadCmd = cmd;
     }
   }
