@@ -2,88 +2,130 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>BIO-HAZ DASHBOARD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIO-HAZ CONTROL</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,1,0" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --c:#00E5BC;--c2:#0099FF;--y:#F5A623;--r:#FF3A3A;--g:#00D166;
-  --bg:#0A0A0A;--s1:#111111;--s2:#1A1A1A;--s3:#222222;
-  --b1:rgba(0,229,188,0.1);--b2:rgba(0,229,188,0.05);
-  --bd:#333333;--bd2:#222222;
+  --bg:#0A0A0A;--s1:#111;--s2:#1A1A1A;--s3:#222;
+  --bd:#2A2A2A;--bd2:#1E1E1E;
+  --text:#A0A0A0;--text-dim:#555;--text-bright:#FFF;
 }
-body{background:var(--bg);color:#A0A0A0;font-family:'Inter',sans-serif;font-size:11px;overflow-x:hidden}
-canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4}
-.wrap{position:relative;z-index:1}
+html{font-size:11px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;min-height:100vh}
 
-.hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:12px}
-.logo-badge{background:var(--c);color:#000;font-family:'Share Tech Mono',monospace;font-weight:700;font-size:11px;padding:4px 8px;letter-spacing:1px;border-radius:2px}
-.logo-name{font-family:'Share Tech Mono',monospace;font-weight:700;font-size:16px;color:#FFF;letter-spacing:2px}
-.ping{width:8px;height:8px;border-radius:50%;background:var(--g)}
-.hdr-stats{display:flex;gap:24px;align-items:center}
-.hs{text-align:left}
-.hs .hl{color:#666;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
-.hs .hv{color:#FFF;font-size:12px;font-family:'Share Tech Mono',monospace}
-.clock-box{font-family:'Share Tech Mono',monospace;font-size:16px;color:#FFF;min-width:80px;text-align:right}
+/* ====== HEADER ====== */
+.hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-badge{background:var(--c);color:#000;font-family:'Share Tech Mono',monospace;font-weight:700;font-size:10px;padding:3px 7px;letter-spacing:1.2px;border-radius:2px}
+.logo-name{font-family:'Share Tech Mono',monospace;font-weight:700;font-size:15px;color:var(--text-bright);letter-spacing:2px}
+.ping{width:7px;height:7px;border-radius:50%;background:var(--g);animation:pulse-glow 2s infinite}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 4px var(--g)}50%{box-shadow:0 0 12px var(--g)}}
+.hdr-stats{display:flex;gap:20px;align-items:center}
+.hs .hl{color:var(--text-dim);font-size:8px;letter-spacing:1px;text-transform:uppercase;margin-bottom:1px}
+.hs .hv{color:var(--text-bright);font-size:11px;font-family:'Share Tech Mono',monospace}
+.clock-box{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--text-bright);min-width:70px;text-align:right}
 
-.body{display:grid;grid-template-columns:180px 1fr 200px;gap:1px;background:var(--bd)}
+/* ====== MODE TOGGLE ====== */
+.mode-toggle{display:flex;border:1px solid var(--bd);border-radius:3px;overflow:hidden;font-family:'Share Tech Mono',monospace;font-size:10px}
+.mode-btn{padding:5px 10px;cursor:pointer;background:var(--s2);color:var(--text);border:none;letter-spacing:0.5px;transition:all 0.15s}
+.mode-btn.active{background:var(--c);color:#000;font-weight:700}
+.mode-btn:hover:not(.active){background:var(--s3)}
 
-.lp{background:var(--s1);padding:12px 0;display:flex;flex-direction:column}
-.lp-sec{padding:8px 12px 4px;font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;font-weight:600}
-.lp-item{padding:8px 12px;display:flex;align-items:center;gap:8px;color:#AAA;font-size:11px;font-family:'Share Tech Mono',monospace}
-.lp-item.on{background:var(--s2);color:#FFF;border-left:2px solid var(--c)}
-.mi{font-family:'Material Symbols Outlined';font-size:14px;width:16px;color:#888}
+/* ====== MAIN GRID ====== */
+.main{display:grid;grid-template-columns:170px 1fr 200px;gap:1px;background:var(--bd2);min-height:calc(100vh - 70px)}
+
+/* ====== LEFT PANEL ====== */
+.lp{background:var(--s1);padding:10px 0;display:flex;flex-direction:column;font-size:10px}
+.lp-sec{padding:6px 10px 3px;font-size:8px;letter-spacing:1.2px;color:var(--text-dim);text-transform:uppercase;font-weight:700}
+.lp-item{padding:6px 10px;display:flex;align-items:center;gap:6px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:10px}
+.lp-item.on{background:var(--s2);color:var(--text-bright);border-left:2px solid var(--c)}
+.mi{font-family:'Material Symbols Outlined';font-size:14px;width:16px;color:#666}
 .lp-item.on .mi{color:var(--c)}
-.lp-val{margin-left:auto;font-size:11px;font-weight:600}
-.lp-bar{height:3px;background:var(--s3);margin:2px 12px 6px;border-radius:2px;overflow:hidden}
-.lp-bar-f{height:100%;transition:width 0.5s ease}
-.lp-divider{height:1px;background:var(--bd2);margin:8px 12px}
+.lp-val{margin-left:auto;font-weight:600;font-size:10px}
+.lp-divider{height:1px;background:var(--bd2);margin:6px 10px}
 
-.cp{background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:12px}
-.sec-title{font-size:10px;letter-spacing:1px;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:8px;text-transform:uppercase;font-weight:600}
+/* ====== CENTER PANEL ====== */
+.cp{background:var(--bg);padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.sec-title{font-size:9px;letter-spacing:1.2px;color:#666;margin-bottom:5px;display:flex;align-items:center;gap:8px;text-transform:uppercase;font-weight:700}
 .sec-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
 
-.env-c{background:var(--s1);border:1px solid var(--bd2);padding:12px;border-radius:4px; transition:0.3s;}
-.env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.env-c .el{font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;margin-bottom:4px}
-.env-c .ev{font-family:'Share Tech Mono',monospace;font-size:20px;color:#FFF}
-.env-c .eu{font-size:10px;color:#888;margin-left:2px}
+/* ====== PANELS ====== */
+.panel{background:var(--s1);border:1px solid var(--bd2);padding:10px;border-radius:3px;transition:border-color 0.3s}
+.panel:hover{border-color:var(--bd)}
 
-.log-box{background:var(--s1);border:1px solid var(--bd2);padding:8px 12px;height:80px;overflow-y:auto;border-radius:4px;font-family:'Share Tech Mono',monospace}
-.ll{font-size:10px;line-height:1.6;display:flex;gap:8px}
-.lt{color:#666}.lm{color:#CCC}.lm.ok{color:var(--c)}.lm.wn{color:var(--y)}.lm.cr{color:var(--r)}
+/* ====== RANGE BAR ====== */
+.range-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-color:var(--c)}
+.range-bar .el{color:var(--text-bright);font-size:8px;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.range-bar .ev{font-family:'Share Tech Mono',monospace;font-size:18px;color:var(--c)}
 
-.ctrl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.cbtn{background:var(--s2);border:1px solid var(--bd);padding:10px 4px;cursor:pointer;text-align:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:#CCC;border-radius:4px;transition:all 0.1s}
-.cbtn:hover:not(:disabled){background:var(--s3);border-color:#555;color:#FFF}
+/* ====== LOG ====== */
+.log-box{background:var(--s1);border:1px solid var(--bd2);padding:6px 8px;height:72px;overflow-y:auto;border-radius:3px;font-family:'Share Tech Mono',monospace}
+.ll{font-size:9px;line-height:1.6;display:flex;gap:6px}
+.lt{color:#444}.lm{color:#999}.lm.ok{color:var(--c)}.lm.wn{color:var(--y)}.lm.cr{color:var(--r)}
+
+/* ====== BUTTONS ====== */
+.ctrl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.cbtn{background:var(--s2);border:1px solid var(--bd);padding:8px 4px;cursor:pointer;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:#BBB;border-radius:3px;transition:all 0.1s;user-select:none}
+.cbtn:hover:not(:disabled){background:var(--s3);border-color:#444;color:var(--text-bright)}
 .cbtn:active:not(:disabled){background:var(--bd);transform:translateY(1px)}
-.cbtn:disabled{opacity:0.3;cursor:not-allowed}
-.ci2{font-family:'Material Symbols Outlined';font-size:16px;display:block;margin-bottom:4px;color:#888}
+.cbtn:disabled{opacity:0.25;cursor:not-allowed}
+.ci2{font-family:'Material Symbols Outlined';font-size:15px;display:block;margin-bottom:3px;color:#666}
 .cbtn:hover:not(:disabled) .ci2{color:var(--c)}
 
-.rp{background:var(--s1);padding:16px;display:flex;flex-direction:column;gap:12px}
-.irow{display:flex;justify-content:space-between;font-size:10px;margin-bottom:6px;font-family:'Share Tech Mono',monospace}
-.ik{color:#888}.iv{color:#FFF}
+/* ====== RIGHT PANEL ====== */
+.rp{background:var(--s1);padding:12px;display:flex;flex-direction:column;gap:10px;font-size:10px}
+.irow{display:flex;justify-content:space-between;font-size:9px;margin-bottom:4px;font-family:'Share Tech Mono',monospace}
+.ik{color:#666}.iv{color:var(--text-bright)}
 
-.meter-block{display:flex;flex-direction:column;gap:8px}
-.mrow{display:flex;justify-content:space-between;font-size:10px;color:#888;margin-bottom:4px;font-family:'Share Tech Mono',monospace}
-.mrow span:last-child{color:#FFF}
-.mtrack{height:4px;background:var(--s3);border-radius:2px}
-.mfill{height:100%;border-radius:2px}
-.mfill.mc{background:var(--c2)}
-.mfill.my{background:var(--y)}
-.mfill.mg{background:var(--g)}
+/* ====== METERS ====== */
+.mrow{display:flex;justify-content:space-between;font-size:9px;color:#666;margin-bottom:3px;font-family:'Share Tech Mono',monospace}
+.mrow span:last-child{color:var(--text-bright)}
+.mtrack{height:3px;background:var(--s3);border-radius:2px;margin-bottom:6px}
+.mfill{height:100%;border-radius:2px;transition:width 0.5s}
+.mc{background:var(--c2)}.my{background:var(--y)}.mg{background:var(--g)}.mr{background:var(--r)}
 
-.ftr{background:var(--s1);border-top:1px solid var(--bd);padding:8px 16px;display:flex;justify-content:space-between;align-items:center}
-.f-left{display:flex;gap:24px}
-.fi{font-size:10px;color:#666;font-family:'Share Tech Mono',monospace}
-.fi span{color:#AAA}
-.f-alert{font-size:10px;font-weight:600;font-family:'Share Tech Mono',monospace}
+/* ====== SEWAGE MAP ====== */
+.map-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.map-zone{background:var(--s2);border:1px solid var(--bd);border-radius:3px;padding:8px 4px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:#666;transition:all 0.3s;cursor:default}
+.map-zone.active{background:rgba(0,229,188,0.12);border-color:var(--c);color:var(--c);box-shadow:0 0 8px rgba(0,229,188,0.15)}
+.map-zone .zone-label{font-size:12px;font-weight:700;display:block}
+.map-zone .zone-status{font-size:7px;letter-spacing:0.5px;margin-top:2px;display:block}
+
+/* ====== SAFETY PANEL ====== */
+.safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.gas-card{background:var(--s2);border:1px solid var(--bd2);border-radius:3px;padding:8px;text-align:center;transition:border-color 0.3s}
+.gas-card .gas-name{font-size:8px;letter-spacing:1px;color:#666;text-transform:uppercase;margin-bottom:3px}
+.gas-card .gas-val{font-family:'Share Tech Mono',monospace;font-size:18px;color:var(--text-bright)}
+.gas-card .gas-unit{font-size:8px;color:#555}
+.gas-card .gas-bar{height:3px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden}
+.gas-card .gas-bar-fill{height:100%;border-radius:2px;transition:width 0.5s}
+.safety-status{text-align:center;padding:6px;border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;margin-top:6px}
+
+/* ====== EMERGENCY ====== */
+.sos-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sos-btn{padding:10px;border:2px solid;border-radius:3px;cursor:pointer;text-align:center;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;background:transparent;transition:all 0.15s}
+.sos-btn:hover{transform:translateY(-1px)}
+.sos-btn.medical{border-color:var(--r);color:var(--r)}
+.sos-btn.medical:hover{background:rgba(255,58,58,0.12);box-shadow:0 0 12px rgba(255,58,58,0.2)}
+.sos-btn.electrical{border-color:var(--y);color:var(--y)}
+.sos-btn.electrical:hover{background:rgba(245,166,35,0.12);box-shadow:0 0 12px rgba(245,166,35,0.2)}
+.sos-btn .sos-icon{font-family:'Material Symbols Outlined';font-size:20px;display:block;margin-bottom:3px}
+.sos-active{animation:sos-flash 0.5s infinite alternate}
+@keyframes sos-flash{from{opacity:1}to{opacity:0.4}}
+
+/* ====== FOOTER ====== */
+.ftr{background:var(--s1);border-top:1px solid var(--bd);padding:6px 16px;display:flex;justify-content:space-between;align-items:center;font-size:9px}
+.fi{color:#444;font-family:'Share Tech Mono',monospace}
+.fi span{color:#777}
+.f-alert{font-weight:600;font-family:'Share Tech Mono',monospace}
 </style>
 </head>
 <body>
-<div class="wrap">
+<!-- ====== HEADER ====== -->
 <div class="hdr">
   <div class="logo">
     <div class="logo-badge">UNIT-01</div>
@@ -91,257 +133,404 @@ canvas#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-e
     <div class="ping"></div>
   </div>
   <div class="hdr-stats">
-    <div class="hs"><div class="hl">UPTIME</div><div class="hv" id="uptime">04:12:37</div></div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-manual" onclick="setMode('manual')">MANUAL</button>
+      <button class="mode-btn" id="mode-ai" onclick="setMode('ai')">AI CONTROL</button>
+    </div>
+    <div class="hs"><div class="hl">UPTIME</div><div class="hv" id="uptime">00:00:00</div></div>
     <div class="hs"><div class="hl">SECTOR</div><div class="hv">7-GAMMA</div></div>
-    <div class="hs"><div class="hl">SYS STATUS</div><div class="hv" id="threat-lbl" style="color:var(--g)">NOMINAL</div></div>
+    <div class="hs"><div class="hl">STATUS</div><div class="hv" id="threat-lbl" style="color:var(--g)">NOMINAL</div></div>
     <div class="clock-box" id="clock">--:--:--</div>
   </div>
 </div>
 
-<div class="body">
+<!-- ====== BODY ====== -->
+<div class="main">
+
+<!-- ====== LEFT SIDEBAR ====== -->
 <div class="lp">
   <div class="lp-sec">SYSTEM</div>
   <div class="lp-item on"><span class="mi">dashboard</span>Overview</div>
-  <div class="lp-item"><span class="mi">battery_charging_full</span>Main Battery<span class="lp-val" id="lv-batt" style="color:var(--g)">87%</span></div>
+  <div class="lp-item"><span class="mi">battery_charging_full</span>Battery<span class="lp-val" id="lv-batt" style="color:var(--g)">87%</span></div>
   <div class="lp-divider"></div>
-  
-  <div class="lp-sec">BOT HARDWARE</div>
+  <div class="lp-sec">HARDWARE</div>
   <div class="lp-item"><span class="mi">settings</span>Drive Motors<span class="lp-val" style="color:var(--g)">OK</span></div>
-  <div class="lp-item"><span class="mi">autorenew</span>Auger Status<span class="lp-val" id="lv-auger" style="color:#FFF">OFF</span></div>
+  <div class="lp-item"><span class="mi">autorenew</span>Auger<span class="lp-val" id="lv-auger" style="color:var(--text-bright)">OFF</span></div>
+  <div class="lp-item"><span class="mi">speed</span>Direction<span class="lp-val" id="lv-dir" style="color:var(--c)">IDLE</span></div>
   <div class="lp-divider"></div>
-  
-  <div class="lp-sec">COMMS LINK</div>
-  <div class="lp-item"><span class="mi">bluetooth</span>HC-05 Status<span class="lp-val" id="bt-status-text" style="color:var(--r)">DISC</span></div>
+  <div class="lp-sec">COMMS</div>
+  <div class="lp-item"><span class="mi">bluetooth</span>HC-05<span class="lp-val" id="bt-status-text" style="color:var(--r)">DISC</span></div>
   <div class="lp-item"><span class="mi">sports_esports</span>Gamepad<span class="lp-val" id="gp-status-text" style="color:var(--r)">NONE</span></div>
   <div class="lp-item"><span class="mi">keyboard</span>Keyboard<span class="lp-val" style="color:var(--c)">READY</span></div>
+  <div class="lp-divider"></div>
+  <div class="lp-sec">AI STATUS</div>
+  <div class="lp-item"><span class="mi">smart_toy</span>YOLO<span class="lp-val" id="lv-yolo" style="color:#666">STANDBY</span></div>
+  <div class="lp-item"><span class="mi">target</span>Target<span class="lp-val" id="lv-tgt" style="color:#666">NONE</span></div>
 </div>
 
+<!-- ====== CENTER ====== -->
 <div class="cp">
-  <div class="env-c" id="range-box" style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-color:var(--c)">
-    <div><span class="el" style="color:#FFF">ULTRASONIC SENSOR RANGE</span><br><span class="ev" id="range-status" style="color:var(--c)">CLEAR</span></div>
-    <div style="text-align:right"><span class="el" style="color:#FFF">DISTANCE</span><br><span class="ev" id="range-val" style="color:var(--c); font-size:28px;">--</span> <span style="color:#888">cm</span></div>
+
+  <!-- RANGE SENSOR -->
+  <div class="panel range-bar" id="range-box">
+    <div>
+      <div class="el">ULTRASONIC RANGE</div>
+      <div class="ev" id="range-status" style="color:var(--c)">CLEAR</div>
+    </div>
+    <div style="text-align:right">
+      <div class="el">DISTANCE</div>
+      <div><span class="ev" id="range-val" style="font-size:26px;color:var(--c)">--</span> <span style="color:#555;font-size:10px">cm</span></div>
+    </div>
   </div>
 
+  <!-- EVENT LOG -->
   <div>
-    <div class="sec-title">SYSTEM EVENT LOG</div>
+    <div class="sec-title">EVENT LOG</div>
     <div class="log-box" id="log-box"></div>
   </div>
 
+  <!-- CONTROLS -->
   <div>
     <div class="sec-title" style="display:flex;justify-content:space-between">
-      <span>MANUAL TELEOPERATION (CONTROLS: WASD / SPACEBAR / XBOX)</span>
-      <button onclick="toggleBluetooth()" id="btn-bt" style="background:var(--c2);color:#000;border:none;padding:4px 8px;border-radius:2px;font-family:'Share Tech Mono';cursor:pointer;font-weight:bold">CONNECT SERIAL</button>
+      <span>TELEOPERATION · WASD / XBOX</span>
+      <button onclick="toggleBluetooth()" id="btn-bt"
+        style="background:var(--c2);color:#000;border:none;padding:3px 8px;border-radius:2px;font-family:'Share Tech Mono';cursor:pointer;font-weight:700;font-size:9px;letter-spacing:0.5px">
+        CONNECT SERIAL
+      </button>
     </div>
-    
-    <div style="display:flex;gap:6px;margin-bottom:8px">
-      <button class="cbtn" onmousedown="queueCmd('X')" id="btn-auger-on" disabled style="flex:1; border-color:var(--y)"><span class="ci2" style="color:var(--y)">autorenew</span>NORMAL (A / Spc)</button>
-      
-      <button class="cbtn" onmousedown="queueCmd('P')" id="btn-auger-pulse" disabled style="flex:1; border-color:var(--r)"><span class="ci2" style="color:var(--r)">bolt</span>PULSE (B / E)</button>
-      
-      <button class="cbtn" onmousedown="queueCmd('x')" id="btn-auger-off" disabled style="flex:1; border-color:#888"><span class="ci2" style="color:#FFF">block</span>STOP AUGER (X / Q)</button>
-      
-      <button class="cbtn" onmousedown="queueCmd('Z')" onmouseup="queueCmd('z')" id="btn-buzz" disabled style="flex:1; border-color:var(--c2)"><span class="ci2" style="color:var(--c2)">campaign</span>HORN (Y / H)</button>
+
+    <!-- Auger row -->
+    <div style="display:flex;gap:5px;margin-bottom:6px">
+      <button class="cbtn" onmousedown="queueCmd('X')" id="btn-auger-on" disabled style="flex:1;border-color:var(--y)">
+        <span class="ci2" style="color:var(--y)">autorenew</span>NORMAL (A)
+      </button>
+      <button class="cbtn" onmousedown="queueCmd('P')" id="btn-auger-pulse" disabled style="flex:1;border-color:var(--r)">
+        <span class="ci2" style="color:var(--r)">bolt</span>PULSE (B)
+      </button>
+      <button class="cbtn" onmousedown="queueCmd('x')" id="btn-auger-off" disabled style="flex:1;border-color:#666">
+        <span class="ci2" style="color:var(--text-bright)">block</span>STOP (X)
+      </button>
+      <button class="cbtn" onmousedown="queueCmd('Z')" onmouseup="queueCmd('z')" id="btn-buzz" disabled style="flex:1;border-color:var(--c2)">
+        <span class="ci2" style="color:var(--c2)">campaign</span>HORN (Y)
+      </button>
     </div>
-    
-    <div class="ctrl-row" style="grid-template-columns:repeat(3,1fr)">
+
+    <!-- D-Pad -->
+    <div class="ctrl-row">
       <div></div>
-      <button class="cbtn" onmousedown="queueCmd('F')" onmouseup="queueCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD (W)</button>
+      <button class="cbtn" onmousedown="queueCmd('F')" onmouseup="queueCmd('S')" id="btn-fwd" disabled><span class="ci2">arrow_upward</span>FWD</button>
       <div></div>
-      <button class="cbtn" onmousedown="queueCmd('L')" onmouseup="queueCmd('S')" id="btn-lft" disabled><span class="ci2">arrow_back</span>LEFT (A)</button>
-      <button class="cbtn" onclick="queueCmd('S')" id="btn-stop" disabled style="border-color:var(--r)"><span class="ci2" style="color:var(--r)">stop</span>STOP (S)</button>
-      <button class="cbtn" onmousedown="queueCmd('R')" onmouseup="queueCmd('S')" id="btn-rgt" disabled><span class="ci2">arrow_forward</span>RIGHT (D)</button>
+      <button class="cbtn" onmousedown="queueCmd('L')" onmouseup="queueCmd('S')" id="btn-lft" disabled><span class="ci2">arrow_back</span>LEFT</button>
+      <button class="cbtn" onclick="queueCmd('S')" id="btn-stop" disabled style="border-color:var(--r)"><span class="ci2" style="color:var(--r)">stop</span>STOP</button>
+      <button class="cbtn" onmousedown="queueCmd('R')" onmouseup="queueCmd('S')" id="btn-rgt" disabled><span class="ci2">arrow_forward</span>RIGHT</button>
       <div></div>
-      <button class="cbtn" onmousedown="queueCmd('B')" onmouseup="queueCmd('S')" id="btn-bwd" disabled><span class="ci2">arrow_downward</span>REV (S)</button>
+      <button class="cbtn" onmousedown="queueCmd('B')" onmouseup="queueCmd('S')" id="btn-bwd" disabled><span class="ci2">arrow_downward</span>REV</button>
       <div></div>
     </div>
   </div>
+
+  <!-- SEWAGE MAP -->
+  <div>
+    <div class="sec-title">SEWAGE NETWORK MAP</div>
+    <div class="panel" style="padding:8px">
+      <div class="map-grid" id="sewer-map">
+        <div class="map-zone active" data-zone="A">
+          <span class="zone-label">A</span>
+          <span class="zone-status">● ACTIVE</span>
+        </div>
+        <div class="map-zone" data-zone="B">
+          <span class="zone-label">B</span>
+          <span class="zone-status">QUEUED</span>
+        </div>
+        <div class="map-zone" data-zone="C">
+          <span class="zone-label">C</span>
+          <span class="zone-status">CLEAR</span>
+        </div>
+        <div class="map-zone" data-zone="D">
+          <span class="zone-label">D</span>
+          <span class="zone-status">CLEAR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMERGENCY -->
+  <div>
+    <div class="sec-title">EMERGENCY RESPONSE</div>
+    <div class="sos-row">
+      <button class="sos-btn medical" id="sos-med" onclick="triggerSOS('medical')">
+        <span class="sos-icon">local_hospital</span>MEDICAL SOS
+      </button>
+      <button class="sos-btn electrical" id="sos-elec" onclick="triggerSOS('electrical')">
+        <span class="sos-icon">bolt</span>ELECTRICAL SOS
+      </button>
+    </div>
+  </div>
+
 </div>
 
+<!-- ====== RIGHT PANEL ====== -->
 <div class="rp">
-  <div class="sec-title">AI VISION ANALYSIS</div>
-  <div class="env-c">
-    <div class="irow"><span class="ik">TARGET CLASSIFICATION</span><span class="iv" id="ai-waste">WET SLUDGE</span></div>
-    <div class="irow"><span class="ik">CURRENT ACTION</span><span class="iv" id="ai-action" style="color:var(--c)">CLEARING</span></div>
+
+  <!-- AI VISION -->
+  <div class="sec-title">AI VISION</div>
+  <div class="panel">
+    <div class="irow"><span class="ik">CLASSIFICATION</span><span class="iv" id="ai-waste">—</span></div>
+    <div class="irow"><span class="ik">MATERIAL</span><span class="iv" id="ai-type" style="color:var(--c)">—</span></div>
+    <div class="irow"><span class="ik">AUGER MODE</span><span class="iv" id="ai-mode">—</span></div>
+    <div class="irow"><span class="ik">ACTION</span><span class="iv" id="ai-action" style="color:var(--c)">STANDBY</span></div>
   </div>
 
-  <div class="sec-title" style="margin-top:8px">POWER DIAGNOSTICS</div>
-  <div class="meter-block">
-    <div><div class="mrow"><span>MAIN CELL</span><span id="mv-batt">87%</span></div><div class="mtrack"><div class="mfill mg" id="mm-batt" style="width:87%"></div></div></div>
-    <div><div class="mrow"><span>MOTOR DRAW</span><span id="mv-draw">1.2A</span></div><div class="mtrack"><div class="mfill my" id="mm-draw" style="width:36%"></div></div></div>
+  <!-- POWER -->
+  <div class="sec-title" style="margin-top:6px">POWER</div>
+  <div>
+    <div class="mrow"><span>BATTERY</span><span id="mv-batt">87%</span></div>
+    <div class="mtrack"><div class="mfill mg" id="mm-batt" style="width:87%"></div></div>
+    <div class="mrow"><span>MOTOR DRAW</span><span id="mv-draw">1.2A</span></div>
+    <div class="mtrack"><div class="mfill my" id="mm-draw" style="width:36%"></div></div>
   </div>
 
-  <div class="sec-title" style="margin-top:8px">ENVIRONMENTAL</div>
-  <div class="env-grid" style="grid-template-columns:1fr">
-    <div class="env-c" style="padding:10px">
-      <div class="el">SUBMERSION DEPTH</div>
-      <div><span class="ev" id="ev-depth">4.7</span><span class="eu">m</span></div>
+  <!-- WORKER SAFETY -->
+  <div class="sec-title" style="margin-top:6px">WORKER SAFETY</div>
+  <div class="safety-grid">
+    <div class="gas-card" id="gas-h2s">
+      <div class="gas-name">H₂S</div>
+      <div class="gas-val" id="gv-h2s">3</div>
+      <div class="gas-unit">ppm</div>
+      <div class="gas-bar"><div class="gas-bar-fill" id="gb-h2s" style="width:15%;background:var(--g)"></div></div>
     </div>
-    <div class="env-c" style="padding:10px">
-      <div class="el">FILTRATION FLOW</div>
-      <div><span class="ev" id="ev-filt">340</span><span class="eu">L/m</span></div>
+    <div class="gas-card" id="gas-ch4">
+      <div class="gas-name">CH₄</div>
+      <div class="gas-val" id="gv-ch4">2</div>
+      <div class="gas-unit">%LEL</div>
+      <div class="gas-bar"><div class="gas-bar-fill" id="gb-ch4" style="width:8%;background:var(--g)"></div></div>
+    </div>
+    <div class="gas-card" id="gas-co2">
+      <div class="gas-name">CO₂</div>
+      <div class="gas-val" id="gv-co2">410</div>
+      <div class="gas-unit">ppm</div>
+      <div class="gas-bar"><div class="gas-bar-fill" id="gb-co2" style="width:8%;background:var(--g)"></div></div>
     </div>
   </div>
+  <div class="safety-status" id="safety-status" style="background:rgba(0,209,102,0.1);color:var(--g);border:1px solid rgba(0,209,102,0.3)">
+    SAFE — ALL LEVELS NOMINAL
+  </div>
+
+  <!-- ENVIRONMENT -->
+  <div class="sec-title" style="margin-top:6px">ENVIRONMENT</div>
+  <div class="panel" style="padding:8px">
+    <div class="irow"><span class="ik">SUBMERSION</span><span class="iv" id="ev-depth">4.7 m</span></div>
+    <div class="irow"><span class="ik">FILTRATION</span><span class="iv" id="ev-filt">340 L/m</span></div>
+    <div class="irow"><span class="ik">WATER TEMP</span><span class="iv" id="ev-temp">24°C</span></div>
+  </div>
+
 </div>
 </div>
 
+<!-- ====== FOOTER ====== -->
 <div class="ftr">
-  <div class="f-left">
-    <div class="fi">SYS_VER: <span>4.7.2</span></div>
+  <div style="display:flex;gap:20px">
+    <div class="fi">VER: <span>5.0.0</span></div>
     <div class="fi">PORT: <span id="port-status">DISCONNECTED</span></div>
     <div class="fi">BAUD: <span>9600</span></div>
+    <div class="fi">MODE: <span id="ftr-mode">MANUAL</span></div>
   </div>
-  <div class="f-alert" id="falert" style="color:var(--g)">SYSTEM ONLINE. AWAITING TELEMETRY.</div>
-</div>
+  <div class="f-alert" id="falert" style="color:var(--g)">AWAITING SERIAL CONNECTION</div>
 </div>
 
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,1,0" rel="stylesheet">
+<!-- ====== JAVASCRIPT ====== -->
 <script>
 const $ = id => document.getElementById(id);
-function ts(){return new Date().toTimeString().slice(0,8)}
+function ts(){ return new Date().toTimeString().slice(0,8); }
 
-$('clock').textContent=ts();
-setInterval(()=>$('clock').textContent=ts(),1000);
+// Clock
+$('clock').textContent = ts();
+setInterval(() => $('clock').textContent = ts(), 1000);
 
-const logs=[];
+// Uptime counter
+let uptimeSeconds = 0;
+setInterval(() => {
+  uptimeSeconds++;
+  const hh = String(Math.floor(uptimeSeconds/3600)).padStart(2,'0');
+  const mm = String(Math.floor((uptimeSeconds%3600)/60)).padStart(2,'0');
+  const ss = String(uptimeSeconds%60).padStart(2,'0');
+  $('uptime').textContent = `${hh}:${mm}:${ss}`;
+}, 1000);
+
+// ========================================
+// EVENT LOG
+// ========================================
+const logs = [];
 function logEvent(msg, type='ok'){
-  logs.unshift({t:'['+ts()+']',m:msg,c:type});
-  if(logs.length>20) logs.pop();
-  $('log-box').innerHTML=logs.map(l=>`<div class="ll"><span class="lt">${l.t}</span><span class="lm ${l.c}">${l.m}</span></div>`).join('');
+  logs.unshift({ t:'['+ts()+']', m:msg, c:type });
+  if (logs.length > 30) logs.pop();
+  $('log-box').innerHTML = logs.map(l =>
+    `<div class="ll"><span class="lt">${l.t}</span><span class="lm ${l.c}">${l.m}</span></div>`
+  ).join('');
 }
-logEvent('Web Dashboard initialized. Ready.', 'ok');
+logEvent('Dashboard initialized', 'ok');
 
-// --- BOT STATE ---
+// ========================================
+// MODE: MANUAL vs AI
+// ========================================
+let controlMode = 'manual'; // 'manual' | 'ai'
+
+function setMode(mode) {
+  controlMode = mode;
+  $('mode-manual').classList.toggle('active', mode === 'manual');
+  $('mode-ai').classList.toggle('active', mode === 'ai');
+  $('ftr-mode').textContent = mode.toUpperCase();
+
+  if (mode === 'ai') {
+    $('lv-yolo').textContent = 'ACTIVE';
+    $('lv-yolo').style.color = 'var(--c)';
+    logEvent('AI CONTROL ENGAGED — Serial owned by Python', 'wn');
+    // Disable manual buttons when in AI mode
+    setButtonsDisabled(true);
+  } else {
+    $('lv-yolo').textContent = 'STANDBY';
+    $('lv-yolo').style.color = '#666';
+    logEvent('MANUAL CONTROL — Serial owned by Dashboard', 'ok');
+    updateBtnStates();
+  }
+}
+
+// ========================================
+// BUTTON STATE MANAGEMENT
+// ========================================
 let portActive = false;
-let augerMode = 'OFF'; // "ON", "PULSE", or "OFF"
+let augerMode = 'OFF';
 
-function updateBtnStates(){
-  const dis = !portActive;
-  ['btn-fwd','btn-bwd','btn-lft','btn-rgt','btn-stop','btn-auger-on','btn-auger-pulse','btn-auger-off','btn-buzz'].forEach(id=>{
-    $(id).disabled=dis;
-  });
+const BTN_IDS = ['btn-fwd','btn-bwd','btn-lft','btn-rgt','btn-stop',
+                 'btn-auger-on','btn-auger-pulse','btn-auger-off','btn-buzz'];
+
+function setButtonsDisabled(dis) {
+  BTN_IDS.forEach(id => $(id).disabled = dis);
 }
 
-// --- WEB SERIAL API ---
-let port;
-let writer;
-let reader;
+function updateBtnStates() {
+  // In AI mode, always disabled
+  if (controlMode === 'ai') { setButtonsDisabled(true); return; }
+  setButtonsDisabled(!portActive);
+}
+
+// ========================================
+// WEB SERIAL API
+// ========================================
+let port, writer, reader;
 let readLoopActive = false;
 
 async function toggleBluetooth() {
-  if(portActive) {
-    await disconnectBluetooth();
-  } else {
-    await connectBluetooth();
-  }
+  if (portActive) await disconnectBluetooth();
+  else await connectBluetooth();
 }
 
 async function connectBluetooth() {
-  if (!("serial" in navigator)) {
-    alert("Web Serial API not supported. Use Google Chrome Desktop.");
+  if (!('serial' in navigator)) {
+    alert('Web Serial API not supported. Use Chrome Desktop.');
     return;
   }
-
   try {
-    logEvent("Requesting COM port...", "wn");
+    logEvent('Requesting COM port...', 'wn');
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
-    
-    // Writer
     writer = port.writable.getWriter();
-    
-    // Reader to catch telemetry
     readLoopActive = true;
     readSerialLoop();
-    
-    portActive = true;
-    $('bt-status-text').textContent = "CONNECTED";
-    $('bt-status-text').style.color = "var(--c)";
-    $('port-status').textContent = "COM_ACTIVE";
-    $('btn-bt').textContent = "DISCONNECT";
-    $('btn-bt').style.background = "var(--r)";
-    
-    updateBtnStates();
-    logEvent("Connected. Telemetry stream open.", "ok");
 
-  } catch (error) {
-    logEvent("Connection failed", "cr");
+    portActive = true;
+    $('bt-status-text').textContent = 'CONN';
+    $('bt-status-text').style.color = 'var(--c)';
+    $('port-status').textContent = 'COM_ACTIVE';
+    $('btn-bt').textContent = 'DISCONNECT';
+    $('btn-bt').style.background = 'var(--r)';
+    $('falert').textContent = 'SERIAL CONNECTED';
+    $('falert').style.color = 'var(--c)';
+
+    updateBtnStates();
+    logEvent('Serial connected — telemetry stream open', 'ok');
+  } catch (e) {
+    logEvent('Connection failed: ' + e.message, 'cr');
   }
 }
 
 async function disconnectBluetooth() {
   readLoopActive = false;
-  if (reader) { try { await reader.cancel(); } catch(e) {} reader = null; }
-  if (writer) { try { await writer.releaseLock(); } catch(e) {} writer = null; }
-  if (port) { try { await port.close(); } catch(e) {} port = null; }
-  
+  try { if (reader) await reader.cancel(); } catch(e) {}
+  reader = null;
+  try { if (writer) writer.releaseLock(); } catch(e) {}
+  writer = null;
+  try { if (port) await port.close(); } catch(e) {}
+  port = null;
+
   portActive = false;
-  $('bt-status-text').textContent = "DISC";
-  $('bt-status-text').style.color = "var(--r)";
-  $('port-status').textContent = "DISCONNECTED";
-  $('btn-bt').textContent = "CONNECT SERIAL";
-  $('btn-bt').style.background = "var(--c2)";
-  
-  // Reset UI
-  $('range-val').textContent = "--";
-  $('range-box').style.borderColor = "var(--bd2)";
-  $('range-box').style.background = "var(--s1)";
-  
+  $('bt-status-text').textContent = 'DISC';
+  $('bt-status-text').style.color = 'var(--r)';
+  $('port-status').textContent = 'DISCONNECTED';
+  $('btn-bt').textContent = 'CONNECT SERIAL';
+  $('btn-bt').style.background = 'var(--c2)';
+  $('range-val').textContent = '--';
+  $('range-box').style.borderColor = 'var(--bd2)';
+  $('falert').textContent = 'SERIAL DISCONNECTED';
+  $('falert').style.color = 'var(--y)';
+
   updateBtnStates();
-  logEvent("Disconnected.", "wn");
+  logEvent('Disconnected', 'wn');
 }
 
-// ==========================================
+// ========================================
 // TELEMETRY READER
-// ==========================================
+// ========================================
 async function readSerialLoop() {
   const textDecoder = new TextDecoderStream();
   const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
   reader = textDecoder.readable.getReader();
-  let buffer = "";
+  let buffer = '';
 
   try {
     while (readLoopActive) {
       const { value, done } = await reader.read();
       if (done) break;
-      if (value) {
-        buffer += value;
-        let lines = buffer.split('\n');
-        buffer = lines.pop(); // Keep incomplete line
-        
-        for (let line of lines) {
-          let txt = line.trim();
-          if (txt.startsWith("D:")) {
-            let dist = parseInt(txt.substring(2));
-            $('range-val').textContent = dist;
-            
-            // Visual Alarms
-            if(dist > 0 && dist < 60) {
-              $('range-box').style.borderColor = "var(--r)";
-              $('range-box').style.background = "rgba(255,58,58,0.1)";
-              $('range-status').textContent = "OBSTACLE DETECTED";
-              $('range-status').style.color = "var(--r)";
-              $('range-val').style.color = "var(--r)";
-            } else {
-              $('range-box').style.borderColor = "var(--c)";
-              $('range-box').style.background = "var(--s1)";
-              $('range-status').textContent = "CLEAR";
-              $('range-status').style.color = "var(--c)";
-              $('range-val').style.color = "var(--c)";
-            }
+      if (!value) continue;
+
+      buffer += value;
+      let lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete tail
+
+      for (let line of lines) {
+        let txt = line.trim();
+        if (txt.startsWith('D:')) {
+          let dist = parseInt(txt.substring(2));
+          if (isNaN(dist)) continue;
+
+          $('range-val').textContent = dist;
+
+          if (dist > 0 && dist < 60) {
+            $('range-box').style.borderColor = 'var(--r)';
+            $('range-box').style.background = 'rgba(255,58,58,0.06)';
+            $('range-status').textContent = 'OBSTACLE';
+            $('range-status').style.color = 'var(--r)';
+            $('range-val').style.color = 'var(--r)';
+          } else {
+            $('range-box').style.borderColor = 'var(--c)';
+            $('range-box').style.background = 'var(--s1)';
+            $('range-status').textContent = 'CLEAR';
+            $('range-status').style.color = 'var(--c)';
+            $('range-val').style.color = 'var(--c)';
           }
         }
       }
     }
-  } catch (error) {
-    console.log(error);
+  } catch (e) {
+    if (readLoopActive) logEvent('Read error: ' + e.message, 'cr');
   } finally {
     if (reader) reader.releaseLock();
   }
 }
 
-// ==========================================
-// ASYNC QUEUE SYSTEM (Prevents crashes)
-// ==========================================
+// ========================================
+// ASYNC COMMAND QUEUE
+// ========================================
 const commandQueue = [];
 let isWriting = false;
 
@@ -351,12 +540,10 @@ async function processQueue() {
   const cmd = commandQueue.shift();
 
   try {
-    const data = new TextEncoder().encode(cmd);
-    await writer.write(data);
-    // Don't log S (Stop) so we don't spam the UI
-    if(cmd !== 'S') logEvent(`TX: ${cmd}`, 'ok');
+    await writer.write(new TextEncoder().encode(cmd));
+    if (cmd !== 'S') logEvent(`TX: ${cmd}`, 'ok');
   } catch (e) {
-    logEvent(`TX Error! Disconnecting.`, 'cr');
+    logEvent('TX Error — disconnecting', 'cr');
     await disconnectBluetooth();
   } finally {
     isWriting = false;
@@ -365,134 +552,227 @@ async function processQueue() {
 }
 
 function queueCmd(cmd) {
-  if (!portActive) return;
-  
-  if (cmd === 'X') { 
-    augerMode = 'ON'; 
-    $('lv-auger').textContent = 'ACTIVE (NORMAL)'; 
-    $('lv-auger').style.color = 'var(--y)'; 
+  if (!portActive || controlMode === 'ai') return;
+
+  // Update auger sidebar
+  if (cmd === 'X') {
+    augerMode = 'ON';
+    $('lv-auger').textContent = 'NORMAL';
+    $('lv-auger').style.color = 'var(--y)';
+  } else if (cmd === 'P') {
+    augerMode = 'PULSE';
+    $('lv-auger').textContent = 'PULSE';
+    $('lv-auger').style.color = 'var(--r)';
+  } else if (cmd === 'x') {
+    augerMode = 'OFF';
+    $('lv-auger').textContent = 'OFF';
+    $('lv-auger').style.color = 'var(--text-bright)';
   }
-  else if (cmd === 'P') { 
-    augerMode = 'PULSE'; 
-    $('lv-auger').textContent = 'ACTIVE (PULSING)'; 
-    $('lv-auger').style.color = 'var(--r)'; 
+
+  // Update direction sidebar
+  const DIR_MAP = { F:'FWD', B:'REV', L:'LEFT', R:'RIGHT', S:'IDLE' };
+  if (DIR_MAP[cmd]) {
+    $('lv-dir').textContent = DIR_MAP[cmd];
+    $('lv-dir').style.color = cmd === 'S' ? 'var(--c)' : 'var(--text-bright)';
   }
-  else if (cmd === 'x') { 
-    augerMode = 'OFF'; 
-    $('lv-auger').textContent = 'OFF'; 
-    $('lv-auger').style.color = '#FFF'; 
-  }
-  
+
   commandQueue.push(cmd);
   processQueue();
 }
 
-// ==========================================
-// KEYBOARD CONTROLS (WASD + Space/E/Q + H)
-// ==========================================
+// ========================================
+// KEYBOARD (WASD + Space/E/Q + H)
+// ========================================
 let activeKey = null;
 let hornActive = false;
 
 window.addEventListener('keydown', (e) => {
-  if (!portActive || e.repeat) return; 
+  if (!portActive || e.repeat || controlMode === 'ai') return;
   const key = e.key.toLowerCase();
-  
-  if (['w', 'a', 's', 'd'].includes(key)) {
+
+  if (['w','a','s','d'].includes(key)) {
+    // 's' conflicts with stop — use it for backward
     activeKey = key;
     if (key === 'w') queueCmd('F');
     if (key === 's') queueCmd('B');
     if (key === 'a') queueCmd('L');
     if (key === 'd') queueCmd('R');
   }
-  
-  if (key === ' ') { e.preventDefault(); queueCmd('X'); } // Space = Normal
-  if (key === 'e') { e.preventDefault(); queueCmd('P'); } // E = Pulse
-  if (key === 'q') { e.preventDefault(); queueCmd('x'); } // Q = Stop
-  
-  // Horn Keyboard control
-  if (key === 'h' && !hornActive) {
-    hornActive = true;
-    queueCmd('Z');
-  }
+  if (key === ' ') { e.preventDefault(); queueCmd('X'); }
+  if (key === 'e') { e.preventDefault(); queueCmd('P'); }
+  if (key === 'q') { e.preventDefault(); queueCmd('x'); }
+  if (key === 'h' && !hornActive) { hornActive = true; queueCmd('Z'); }
 });
 
 window.addEventListener('keyup', (e) => {
-  if (!portActive) return;
+  if (!portActive || controlMode === 'ai') return;
   const key = e.key.toLowerCase();
-  if (key === activeKey) {
-    queueCmd('S');
-    activeKey = null;
-  }
-  // Release horn
-  if (key === 'h') {
-    hornActive = false;
-    queueCmd('z');
-  }
+  if (key === activeKey) { queueCmd('S'); activeKey = null; }
+  if (key === 'h') { hornActive = false; queueCmd('z'); }
 });
 
-// ==========================================
-// HTML5 GAMEPAD API (XBOX CONTROLLER)
-// ==========================================
-let lastGamepadCmd = "";
+// ========================================
+// GAMEPAD (XBOX)
+// ========================================
+let lastGamepadCmd = '';
 let lastHornState = false;
 
 function pollGamepad() {
   requestAnimationFrame(pollGamepad);
-  if (!portActive) return;
+  if (!portActive || controlMode === 'ai') return;
 
-  const gp = navigator.getGamepads()[0]; 
-  
-  if (gp) {
-    let cmd = "S"; 
+  const gp = navigator.getGamepads()[0];
+  if (!gp) return;
 
-    // Increased deadzone from 0.5 to 0.65 to prevent flicker crashing
-    const up = gp.buttons[12]?.pressed || gp.axes[1] < -0.65;
-    const down = gp.buttons[13]?.pressed || gp.axes[1] > 0.65;
-    const left = gp.buttons[14]?.pressed || gp.axes[0] < -0.65;
-    const right = gp.buttons[15]?.pressed || gp.axes[0] > 0.65;
-    
-    const startAuger = gp.buttons[0]?.pressed; // A Button
-    const pulseAuger = gp.buttons[1]?.pressed; // B Button
-    const stopAuger = gp.buttons[2]?.pressed;  // X Button
-    const hornPressed = gp.buttons[3]?.pressed;// Y Button
+  let cmd = 'S';
+  const DZ = 0.65;
 
-    // Horn Logic
-    if (hornPressed && !lastHornState) {
-      queueCmd('Z');
-      lastHornState = true;
-    } else if (!hornPressed && lastHornState) {
-      queueCmd('z');
-      lastHornState = false;
-    }
+  const up    = gp.buttons[12]?.pressed || gp.axes[1] < -DZ;
+  const down  = gp.buttons[13]?.pressed || gp.axes[1] >  DZ;
+  const left  = gp.buttons[14]?.pressed || gp.axes[0] < -DZ;
+  const right = gp.buttons[15]?.pressed || gp.axes[0] >  DZ;
 
-    // Command Logic
-    if (startAuger && augerMode !== 'ON') cmd = "X";
-    else if (pulseAuger && augerMode !== 'PULSE') cmd = "P";
-    else if (stopAuger && augerMode !== 'OFF') cmd = "x";
-    else if (up) cmd = "F";
-    else if (down) cmd = "B";
-    else if (left) cmd = "L";
-    else if (right) cmd = "R";
-    else if (startAuger || pulseAuger || stopAuger || hornPressed) return; 
+  const btnA = gp.buttons[0]?.pressed;
+  const btnB = gp.buttons[1]?.pressed;
+  const btnX = gp.buttons[2]?.pressed;
+  const btnY = gp.buttons[3]?.pressed;
 
-    if (cmd !== lastGamepadCmd) {
-      queueCmd(cmd);
-      lastGamepadCmd = cmd;
+  // Horn
+  if (btnY && !lastHornState) { queueCmd('Z'); lastHornState = true; }
+  else if (!btnY && lastHornState) { queueCmd('z'); lastHornState = false; }
+
+  // Auger
+  if (btnA && augerMode !== 'ON')   cmd = 'X';
+  else if (btnB && augerMode !== 'PULSE') cmd = 'P';
+  else if (btnX && augerMode !== 'OFF')   cmd = 'x';
+  // Movement
+  else if (up)    cmd = 'F';
+  else if (down)  cmd = 'B';
+  else if (left)  cmd = 'L';
+  else if (right) cmd = 'R';
+  else if (btnA || btnB || btnX || btnY) return;
+
+  if (cmd !== lastGamepadCmd) { queueCmd(cmd); lastGamepadCmd = cmd; }
+}
+
+window.addEventListener('gamepadconnected', () => {
+  logEvent('Gamepad connected', 'ok');
+  $('gp-status-text').textContent = 'CONN';
+  $('gp-status-text').style.color = 'var(--c)';
+});
+window.addEventListener('gamepaddisconnected', () => {
+  $('gp-status-text').textContent = 'NONE';
+  $('gp-status-text').style.color = 'var(--r)';
+});
+pollGamepad();
+
+// ========================================
+// EMERGENCY SOS
+// ========================================
+let sosActive = { medical: false, electrical: false };
+
+function triggerSOS(type) {
+  const btn = type === 'medical' ? $('sos-med') : $('sos-elec');
+  sosActive[type] = !sosActive[type];
+
+  if (sosActive[type]) {
+    btn.classList.add('sos-active');
+    logEvent(`!!! ${type.toUpperCase()} SOS ACTIVATED !!!`, 'cr');
+    $('threat-lbl').textContent = 'EMERGENCY';
+    $('threat-lbl').style.color = 'var(--r)';
+    $('falert').textContent = `${type.toUpperCase()} EMERGENCY ACTIVE`;
+    $('falert').style.color = 'var(--r)';
+  } else {
+    btn.classList.remove('sos-active');
+    logEvent(`${type.toUpperCase()} SOS cleared`, 'wn');
+    // Only reset status if both SOS are off
+    if (!sosActive.medical && !sosActive.electrical) {
+      $('threat-lbl').textContent = 'NOMINAL';
+      $('threat-lbl').style.color = 'var(--g)';
+      $('falert').textContent = 'SYSTEM ONLINE';
+      $('falert').style.color = 'var(--g)';
     }
   }
 }
 
-window.addEventListener("gamepadconnected", (e) => {
-  logEvent(`Gamepad Connected`, 'ok');
-  $('gp-status-text').textContent = "CONNECTED";
-  $('gp-status-text').style.color = "var(--c)";
-});
-window.addEventListener("gamepaddisconnected", (e) => {
-  $('gp-status-text').textContent = "NONE";
-  $('gp-status-text').style.color = "var(--r)";
-});
+// ========================================
+// SIMULATED GAS TELEMETRY
+// ========================================
+function simulateGas() {
+  // Random walk around baseline values
+  const h2s = Math.max(0, 3 + Math.round((Math.random()-0.5) * 4));
+  const ch4 = Math.max(0, 2 + Math.round((Math.random()-0.5) * 3));
+  const co2 = Math.max(300, 410 + Math.round((Math.random()-0.5) * 60));
 
-pollGamepad();
+  $('gv-h2s').textContent = h2s;
+  $('gv-ch4').textContent = ch4;
+  $('gv-co2').textContent = co2;
+
+  // H2S: warn>10, danger>20
+  const h2sPct = Math.min(100, (h2s/30)*100);
+  const h2sColor = h2s > 20 ? 'var(--r)' : h2s > 10 ? 'var(--y)' : 'var(--g)';
+  $('gb-h2s').style.width = h2sPct + '%';
+  $('gb-h2s').style.background = h2sColor;
+
+  // CH4: warn>10, danger>25
+  const ch4Pct = Math.min(100, (ch4/30)*100);
+  const ch4Color = ch4 > 25 ? 'var(--r)' : ch4 > 10 ? 'var(--y)' : 'var(--g)';
+  $('gb-ch4').style.width = ch4Pct + '%';
+  $('gb-ch4').style.background = ch4Color;
+
+  // CO2: warn>1000, danger>5000
+  const co2Pct = Math.min(100, (co2/5000)*100);
+  const co2Color = co2 > 5000 ? 'var(--r)' : co2 > 1000 ? 'var(--y)' : 'var(--g)';
+  $('gb-co2').style.width = co2Pct + '%';
+  $('gb-co2').style.background = co2Color;
+
+  // Overall safety status
+  const worst = (h2s > 20 || ch4 > 25 || co2 > 5000) ? 'danger'
+              : (h2s > 10 || ch4 > 10 || co2 > 1000) ? 'warn' : 'safe';
+
+  const statusEl = $('safety-status');
+  if (worst === 'danger') {
+    statusEl.textContent = 'DANGER — EVACUATE IMMEDIATELY';
+    statusEl.style.background = 'rgba(255,58,58,0.12)';
+    statusEl.style.color = 'var(--r)';
+    statusEl.style.borderColor = 'rgba(255,58,58,0.4)';
+  } else if (worst === 'warn') {
+    statusEl.textContent = 'CAUTION — VENTILATE AREA';
+    statusEl.style.background = 'rgba(245,166,35,0.12)';
+    statusEl.style.color = 'var(--y)';
+    statusEl.style.borderColor = 'rgba(245,166,35,0.4)';
+  } else {
+    statusEl.textContent = 'SAFE — ALL LEVELS NOMINAL';
+    statusEl.style.background = 'rgba(0,209,102,0.08)';
+    statusEl.style.color = 'var(--g)';
+    statusEl.style.borderColor = 'rgba(0,209,102,0.3)';
+  }
+}
+
+// Run gas simulation every 3 seconds
+simulateGas();
+setInterval(simulateGas, 3000);
+
+// ========================================
+// SEWAGE MAP — cycle active zone for demo
+// ========================================
+const ZONES = ['A','B','C','D'];
+let activeZoneIdx = 0;
+
+function cycleZone() {
+  const zones = document.querySelectorAll('.map-zone');
+  zones.forEach(z => {
+    z.classList.remove('active');
+    z.querySelector('.zone-status').textContent = 'CLEAR';
+  });
+  activeZoneIdx = (activeZoneIdx + 1) % ZONES.length;
+  const active = zones[activeZoneIdx];
+  active.classList.add('active');
+  active.querySelector('.zone-status').textContent = '● ACTIVE';
+}
+// Cycle every 20s for demo
+setInterval(cycleZone, 20000);
+
 </script>
 </body>
 </html>
