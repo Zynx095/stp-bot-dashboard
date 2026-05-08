@@ -3,22 +3,20 @@ import cv2
 import time
 import numpy as np
 import serial
-
-# -------- SYSTEM CONFIG --------
-MISS_LIMIT = 15 # Increased to give a 0.5 second grace period
+-
+MISS_LIMIT = 15 
 USE_ARDUINO = True  
-COM_PORT = 'COM5'   # <--- DOUBLE CHECK THIS! IF USING USB CABLE, IT IS LIKELY COM3 OR COM4!
+COM_PORT = 'COM5'  
 BAUD_RATE = 9600
 
 print("[SYS] Booting Neural Net...")
 model = YOLO("yolov8n.pt")
-cap = cv2.VideoCapture(1) # Remember to change to 0 if using laptop webcam!
+cap = cv2.VideoCapture(1) 
 
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
-# -------- HUD SETTINGS & MAPPING --------
 CENTER_THRESHOLD = 60
-CONF_THRESHOLD = 0.50 # Lowered slightly so it tracks easier
+CONF_THRESHOLD = 0.50 
 CLOSE_Y_PIXELS = 80 
 PUMP_DURATION_FRAMES = 40
 
@@ -64,7 +62,7 @@ def try_connect_serial():
     try:
         ser = serial.Serial(COM_PORT, BAUD_RATE, timeout=0.1)
         print(f"\n[SYS] >>> PORT {COM_PORT} ACQUIRED. YOLO VISION IN CONTROL <<<\n")
-        time.sleep(2) # Give Arduino time to wake up
+        time.sleep(2) 
         return ser
     except serial.SerialException:
         return None
@@ -132,10 +130,6 @@ while True:
         current_locked_det = detections[0]
         locked_track_id = current_locked_det["track_id"]
         miss_count = 0
-
-    # ==========================================
-    # AI CALCULATES INTENDED MOVE 
-    # ==========================================
     move = "STOP"
     command = "S"
     
@@ -180,10 +174,9 @@ while True:
                 locked_track_id = None 
 
     else:
-        # THE FIX: If we have a target OR we are within the grace period buffer
+  
         if current_locked_det or (locked_track_id is not None and miss_count <= MISS_LIMIT):
-            
-            # If currently visible, use the real coordinates. If in grace period, just keep last command!
+       
             if current_locked_det:
                 cx = current_locked_det["cx"]
                 is_close = current_locked_det["y2"] > (h - CLOSE_Y_PIXELS)
@@ -211,13 +204,12 @@ while True:
                         action_state = "COLLECTING_BITE"
                         collect_timer = 0
             else:
-                # WE ARE IN THE GRACE PERIOD (Camera blinked!)
-                # Just repeat whatever the last physical command was!
+                
                 command = last_command
                 action_state = "TRACKING THRU BLINK"
 
         else:
-            # Fully lost target (exceeded miss limit)
+        
             action_state = "SCANNING"
             if ai_auger_active:
                 command = "x"
@@ -225,9 +217,6 @@ while True:
             else:
                 command = "S" 
 
-    # ==========================================
-    # SEND TO ARDUINO
-    # ==========================================
     if arduino:
         try:
             if arduino.in_waiting > 0:
@@ -245,7 +234,6 @@ while True:
         except Exception as e:
             pass
 
-    # -------- DRAW TARGETS & TELEMETRY --------
     for d in detections:
         x1, y1, x2, y2 = d["box"]
         color = d["color"]
